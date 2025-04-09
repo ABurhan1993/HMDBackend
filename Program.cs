@@ -25,6 +25,8 @@ builder.Services.AddCors(options =>
     });
 });
 
+
+
 // إضافة DbContext قبل بناء التطبيق
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
