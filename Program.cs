@@ -12,11 +12,9 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(
         builder =>
         {
-
-            //you can configure your custom policy
-            builder.AllowAnyOrigin()
-                                .AllowAnyHeader()
-                                .AllowAnyMethod();
+            builder.AllowAnyOrigin()  // السماح بأي منشأ
+                   .AllowAnyHeader()  // السماح بأي ترويسة
+                   .AllowAnyMethod();  // السماح بأي طريقة (GET, POST, ... )
         });
 
     options.AddPolicy("AllowLocalhost", policy =>
@@ -34,6 +32,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
+// تفعيل CORS باستخدام السياسة المحددة
+app.UseCors("AllowLocalhost");
+
 // إعداد الـ Swagger للعرض في بيئات التطوير والإنتاج
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
@@ -41,11 +42,8 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
-
 // إعداد الـ WeatherForecast
-var summaries = new[]
-{
+var summaries = new[] {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
