@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "dgSpecHash": "v4w88dsUQW/J4E80PAzyt/XaPI9CArmZ6E9NzIXRRd2uxRofi6nnXNsFheum533vHAFyZbGOSgPoprkmaulYIg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\SAI Kitchen\\Desktop\\MhdCRM\\CrmBackend\\CrmBackend.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\SAI Kitchen\\.nuget\\packages\\microsoft.aspnetcore.openapi\\8.0.0\\microsoft.aspnetcore.openapi.8.0.0.nupkg.sha512",
+    "C:\\Users\\SAI Kitchen\\.nuget\\packages\\microsoft.extensions.apidescription.server\\6.0.5\\microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
+    "C:\\Users\\SAI Kitchen\\.nuget\\packages\\microsoft.openapi\\1.4.3\\microsoft.openapi.1.4.3.nupkg.sha512",
+    "C:\\Users\\SAI Kitchen\\.nuget\\packages\\swashbuckle.aspnetcore\\6.4.0\\swashbuckle.aspnetcore.6.4.0.nupkg.sha512",
+    "C:\\Users\\SAI Kitchen\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.4.0\\swashbuckle.aspnetcore.swagger.6.4.0.nupkg.sha512",
+    "C:\\Users\\SAI Kitchen\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.4.0\\swashbuckle.aspnetcore.swaggergen.6.4.0.nupkg.sha512",
+    "C:\\Users\\SAI Kitchen\\.nuget\\packages\\swashbuckle.aspnetcore.swaggerui\\6.4.0\\swashbuckle.aspnetcore.swaggerui.6.4.0.nupkg.sha512"
+  ],
+  "logs": []
+}
