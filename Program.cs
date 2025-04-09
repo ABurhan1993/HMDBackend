@@ -17,7 +17,7 @@ builder.Services.AddCors(options =>
                    .AllowAnyMethod();  // السماح بأي طريقة (GET, POST, ... )
         });
 
-    options.AddPolicy("AllowLocalhost", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins("http://localhost:3000", "https://mhdcrm.onrender.com")  // السماح بالوصول من هذا الرابط
               .AllowAnyHeader()
@@ -33,7 +33,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 var app = builder.Build();
 
 // تفعيل CORS باستخدام السياسة المحددة
-app.UseCors("AllowLocalhost");
+app.UseCors("AllowFrontend");
 
 // إعداد الـ Swagger للعرض في بيئات التطوير والإنتاج
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
