@@ -1,4 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
+using CrmBackend.Application.Handlers;
+using CrmBackend.Application.Interfaces;
+using CrmBackend.Application.Services;
+using CrmBackend.Domain.Services;
+using CrmBackend.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using CrmBackend.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,10 +42,43 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+
+
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<RegisterAdminCommandHandler>();
+builder.Services.AddControllers(); // مهمة جداً
+builder.Services.AddEndpointsApiExplorer();
+
+
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<LoginCommandHandler>();
+
 var app = builder.Build();
 
 // تفعيل CORS باستخدام السياسة المحددة
+app.UseRouting();
 app.UseCors("AllowFrontend");
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.MapControllers(); // ضروري لرسم الكنترولرز
 
 // إعداد الـ Swagger للعرض في بيئات التطوير والإنتاج
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())

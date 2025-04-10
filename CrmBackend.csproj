@@ -8,20 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Application\Interfaces\" />
-    <Folder Include="Application\Handlers\" />
-    <Folder Include="Application\Commands\" />
-    <Folder Include="Domain\Entities\" />
-    <Folder Include="Domain\Services\" />
     <Folder Include="Domain\ValueObjects\" />
-    <Folder Include="Infrastructure\Repositories\" />
-    <Folder Include="Web %28API%29\Controllers\" />
   </ItemGroup>
 
 </Project>
