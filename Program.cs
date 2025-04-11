@@ -29,7 +29,7 @@ builder.Services.AddCors(options =>
 
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "https://mhdcrm.onrender.com")  // السماح بالوصول من هذا الرابط
+        policy.WithOrigins("http://localhost:3000", "http://localhost:5173", "https://mhdcrm.onrender.com")  // السماح بالوصول من هذا الرابط
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
