@@ -10,6 +10,7 @@ using System.Text;
 using CrmBackend.Infrastructure.Data;
 using CrmBackend.Domain.Constants;
 using CrmBackend.Application.Handlers.CustomerHandlers;
+using CrmBackend.Infrastructure.Seeding;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -103,6 +104,11 @@ app.UseRouting();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await CrmBackend.Infrastructure.Seeding.SeedData.InitializeAsync(services);
+}
 app.MapControllers();
 
 // Swagger UI
@@ -110,6 +116,11 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await SeedData.InitializeAsync(services);
 }
 
 app.Run();
