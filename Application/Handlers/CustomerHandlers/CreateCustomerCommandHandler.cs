@@ -1,0 +1,54 @@
+﻿using CrmBackend.Application.Commands.CustomerCommands;
+using CrmBackend.Domain.Entities;
+using CrmBackend.Domain.Enums;
+using CrmBackend.Domain.Services;
+
+namespace CrmBackend.Application.Handlers.CustomerHandlers;
+
+public class CreateCustomerCommandHandler
+{
+    private readonly ICustomerRepository _customerRepository;
+    private readonly IUserRepository _userRepository;
+
+    public CreateCustomerCommandHandler(ICustomerRepository customerRepository, IUserRepository userRepository)
+    {
+        _customerRepository = customerRepository;
+        _userRepository = userRepository;
+    }
+
+    public async Task<int> Handle(CreateCustomerCommand command)
+    {
+        var user = await _userRepository.GetByIdAsync(command.CreatedBy);
+        if (user == null)
+            throw new Exception("Invalid user");
+
+        var customer = new Customer
+        {
+            CustomerName = command.CustomerName,
+            CustomerEmail = command.CustomerEmail,
+            CustomerContact = command.CustomerContact,
+            CustomerWhatsapp = command.CustomerWhatsapp,
+            CustomerAddress = command.CustomerAddress,
+            CustomerCity = command.CustomerCity,
+            CustomerCountry = command.CustomerCountry,
+            CustomerNationality = command.CustomerNationality,
+            CustomerNationalId = command.CustomerNationalId,
+            CustomerNotes = command.CustomerNotes,
+            CustomerNextMeetingDate = command.CustomerNextMeetingDate,
+            ContactStatus = (ContactStatus)command.ContactStatus,
+            IsVisitedShowroom = command.IsVisitedShowroom,
+            CustomerTimeSpent = command.CustomerTimeSpent,
+            WayOfContact = (WayOfContact)command.WayOfContact,
+            BranchId = user.BranchId,
+            UserId = user.Id,
+            CustomerAssignedTo = command.CustomerAssignedTo,
+            CreatedBy = command.CreatedBy,
+            CreatedDate = DateTime.UtcNow.ToString("s"),
+            IsActive = true,
+            IsDeleted = false
+        };
+
+        await _customerRepository.AddAsync(customer);
+        return customer.CustomerId;
+    }
+}

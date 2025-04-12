@@ -1,5 +1,4 @@
-﻿
-using CrmBackend.Application.Handlers;
+﻿using CrmBackend.Application.Handlers;
 using CrmBackend.Application.Interfaces;
 using CrmBackend.Application.Services;
 using CrmBackend.Domain.Services;
@@ -9,42 +8,53 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using CrmBackend.Infrastructure.Data;
+using CrmBackend.Domain.Constants;
+using CrmBackend.Application.Handlers.CustomerHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// إضافة خدمات الـ Swagger
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// إضافة CORS
+// CORS
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(
-        builder =>
-        {
-            builder.AllowAnyOrigin()  // السماح بأي منشأ
-                   .AllowAnyHeader()  // السماح بأي ترويسة
-                   .AllowAnyMethod();  // السماح بأي طريقة (GET, POST, ... )
-        });
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+    });
 
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173", "https://mhdcrm.onrender.com")  // السماح بالوصول من هذا الرابط
+        policy.WithOrigins("http://localhost:3000", "http://localhost:5173", "https://mhdcrm.onrender.com")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
 });
 
-
-
-// إضافة DbContext قبل بناء التطبيق
+// DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
+// Authorization Policies
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("CanCreateOrUpdate", policy =>
+        policy.RequireRole(RoleConstants.Admin, RoleConstants.User));
 
+    options.AddPolicy("CanComment", policy =>
+        policy.RequireRole(RoleConstants.Admin, RoleConstants.User));
 
+    options.AddPolicy("CanView", policy =>
+        policy.RequireRole(RoleConstants.Admin, RoleConstants.User, RoleConstants.Designer));
 
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireRole(RoleConstants.Admin));
+});
+
+// JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -60,57 +70,46 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+// Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<RegisterAdminCommandHandler>();
-builder.Services.AddControllers(); // مهمة جداً
-builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+builder.Services.AddScoped<ICustomerCommentRepository, CustomerCommentRepository>();
 
-
+// Services
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+
+// Handlers
 builder.Services.AddScoped<LoginCommandHandler>();
+builder.Services.AddScoped<RegisterAdminCommandHandler>();
+
+builder.Services.AddScoped<CreateCustomerCommandHandler>();
+builder.Services.AddScoped<UpdateCustomerHandler>();
+builder.Services.AddScoped<UpdateCustomerAssignmentHandler>();
+builder.Services.AddScoped<AddCustomerCommentHandler>();
+
+builder.Services.AddScoped<GetAllCustomersHandler>();
+builder.Services.AddScoped<GetCustomerByIdHandler>();
+builder.Services.AddScoped<GetCustomersByContactStatusHandler>();
+builder.Services.AddScoped<GetCustomersByWayOfContactHandler>();
+builder.Services.AddScoped<GetCustomersByAssignedToIdHandler>();
+
+// MVC Controllers
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
-// تفعيل CORS باستخدام السياسة المحددة
+// Middleware
 app.UseRouting();
 app.UseCors("AllowFrontend");
-
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapControllers();
 
-app.MapControllers(); // ضروري لرسم الكنترولرز
-
-// إعداد الـ Swagger للعرض في بيئات التطوير والإنتاج
+// Swagger UI
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// إعداد الـ WeatherForecast
-var summaries = new[] {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
-
 app.Run();
-
-// تعريف الكلاس WeatherForecast
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

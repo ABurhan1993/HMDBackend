@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CrmBackend.Application.Commands;
 using CrmBackend.Application.Handlers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CrmBackend.Web.Controllers;
 
+[AllowAnonymous]
 [ApiController]
 [Route("api/[controller]")]
 public class AuthenticationController : ControllerBase
