@@ -25,4 +25,12 @@ public class UserRepository : IUserRepository
         return await _context.Users.FindAsync(id);
     }
 
+    public async Task<List<User>> GetAllAsync()
+    {
+        return await _context.Users
+            .Where(u => u.IsActive && !u.IsDeleted)
+            .ToListAsync();
+    }
+
+
 }
