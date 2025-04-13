@@ -14,7 +14,7 @@ namespace CrmBackend.Application.DTOs.CustomersDTOs
         public string? CustomerCity { get; set; }
         public string? CustomerCountry { get; set; }
         public string? CustomerNationality { get; set; }
-        public string? CustomerNextMeetingDate { get; set; }
+        public DateTime? CustomerNextMeetingDate { get; set; }
 
         public ContactStatus ContactStatus { get; set; }
         public string ContactStatusName => ContactStatus.ToString();

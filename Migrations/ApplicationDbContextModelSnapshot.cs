@@ -30,6 +30,12 @@ namespace CrmBackend.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -39,6 +45,12 @@ namespace CrmBackend.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -59,11 +71,11 @@ namespace CrmBackend.Migrations
                     b.Property<int>("ContactStatus")
                         .HasColumnType("integer");
 
-                    b.Property<Guid>("CreatedBy")
+                    b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("CreatedDate")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CustomerAddress")
                         .HasColumnType("text");
@@ -71,8 +83,8 @@ namespace CrmBackend.Migrations
                     b.Property<Guid?>("CustomerAssignedBy")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("CustomerAssignedDate")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("CustomerAssignedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid?>("CustomerAssignedTo")
                         .HasColumnType("uuid");
@@ -93,14 +105,11 @@ namespace CrmBackend.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("CustomerNationalId")
-                        .HasColumnType("text");
-
                     b.Property<string>("CustomerNationality")
                         .HasColumnType("text");
 
-                    b.Property<string>("CustomerNextMeetingDate")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("CustomerNextMeetingDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CustomerNotes")
                         .HasColumnType("text");
@@ -132,23 +141,14 @@ namespace CrmBackend.Migrations
                     b.Property<bool?>("IsEscalationRequested")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid?>("IsReturnedBy")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool?>("IsReturnedNotRespondingCustomer")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("IsReturnedNotRespondingCustomerDate")
-                        .HasColumnType("text");
-
                     b.Property<bool?>("IsVisitedShowroom")
                         .HasColumnType("boolean");
 
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("UpdatedDate")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid?>("UserId")
                         .HasColumnType("uuid");
@@ -160,8 +160,6 @@ namespace CrmBackend.Migrations
 
                     b.HasIndex("BranchId");
 
-                    b.HasIndex("CreatedBy");
-
                     b.HasIndex("CustomerAssignedBy");
 
                     b.HasIndex("CustomerAssignedTo");
@@ -169,10 +167,6 @@ namespace CrmBackend.Migrations
                     b.HasIndex("EscalatedBy");
 
                     b.HasIndex("EscalationRequestedBy");
-
-                    b.HasIndex("IsReturnedBy");
-
-                    b.HasIndex("UpdatedBy");
 
                     b.HasIndex("UserId");
 
@@ -193,17 +187,23 @@ namespace CrmBackend.Migrations
                     b.Property<Guid?>("CreatedBy")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("CreatedDate")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("CustomerId")
                         .HasColumnType("integer");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("UpdatedDate")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("CustomerBranchId");
 
@@ -225,14 +225,14 @@ namespace CrmBackend.Migrations
                     b.Property<Guid>("CommentAddedBy")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("CommentAddedOn")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("CommentAddedOn")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("integer");
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
 
-                    b.Property<string>("CreatedDate")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("CustomerCommentDetail")
                         .IsRequired()
@@ -241,7 +241,7 @@ namespace CrmBackend.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("IsActve")
+                    b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
@@ -250,8 +250,8 @@ namespace CrmBackend.Migrations
                     b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("UpdatedDate")
-                        .HasColumnType("text");
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("CustomerCommentId");
 
@@ -259,7 +259,7 @@ namespace CrmBackend.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("CustomerComment");
+                    b.ToTable("CustomerComments");
                 });
 
             modelBuilder.Entity("CrmBackend.Domain.Entities.Role", b =>
@@ -268,9 +268,27 @@ namespace CrmBackend.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -310,6 +328,12 @@ namespace CrmBackend.Migrations
                     b.Property<int>("BranchId")
                         .HasColumnType("integer");
 
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasMaxLength(150)
@@ -320,12 +344,24 @@ namespace CrmBackend.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<Guid>("RoleId")
                         .HasColumnType("uuid");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
@@ -341,12 +377,6 @@ namespace CrmBackend.Migrations
                     b.HasOne("CrmBackend.Domain.Entities.Branch", "Branch")
                         .WithMany("Customers")
                         .HasForeignKey("BranchId");
-
-                    b.HasOne("CrmBackend.Domain.Entities.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.HasOne("CrmBackend.Domain.Entities.User", "CustomerAssignedByUser")
                         .WithMany()
@@ -364,21 +394,11 @@ namespace CrmBackend.Migrations
                         .WithMany()
                         .HasForeignKey("EscalationRequestedBy");
 
-                    b.HasOne("CrmBackend.Domain.Entities.User", "IsReturnedByUser")
-                        .WithMany()
-                        .HasForeignKey("IsReturnedBy");
-
-                    b.HasOne("CrmBackend.Domain.Entities.User", "UpdatedByUser")
-                        .WithMany()
-                        .HasForeignKey("UpdatedBy");
-
                     b.HasOne("CrmBackend.Domain.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId");
 
                     b.Navigation("Branch");
-
-                    b.Navigation("CreatedByUser");
 
                     b.Navigation("CustomerAssignedByUser");
 
@@ -387,10 +407,6 @@ namespace CrmBackend.Migrations
                     b.Navigation("EscalatedByUser");
 
                     b.Navigation("EscalationRequestedByUser");
-
-                    b.Navigation("IsReturnedByUser");
-
-                    b.Navigation("UpdatedByUser");
 
                     b.Navigation("User");
                 });

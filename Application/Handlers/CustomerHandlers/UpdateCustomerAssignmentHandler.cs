@@ -26,9 +26,9 @@ namespace CrmBackend.Application.Handlers.CustomerHandlers
 
             customer.CustomerAssignedTo = command.AssignedTo;
             customer.CustomerAssignedBy = command.AssignedBy;
-            customer.CustomerAssignedDate = DateTime.UtcNow.ToString("s");
+            customer.CustomerAssignedDate = DateTime.UtcNow;
             customer.UpdatedBy = command.AssignedBy;
-            customer.UpdatedDate = DateTime.UtcNow.ToString("s");
+            customer.UpdatedDate = DateTime.UtcNow;
 
             await _customerRepository.UpdateAsync(customer);
         }

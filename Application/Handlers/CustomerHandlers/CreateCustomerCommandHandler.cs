@@ -32,7 +32,6 @@ public class CreateCustomerCommandHandler
             CustomerCity = command.CustomerCity,
             CustomerCountry = command.CustomerCountry,
             CustomerNationality = command.CustomerNationality,
-            CustomerNationalId = command.CustomerNationalId,
             CustomerNotes = command.CustomerNotes,
             CustomerNextMeetingDate = command.CustomerNextMeetingDate,
             ContactStatus = (ContactStatus)command.ContactStatus,
@@ -43,7 +42,7 @@ public class CreateCustomerCommandHandler
             UserId = user.Id,
             CustomerAssignedTo = command.CustomerAssignedTo,
             CreatedBy = command.CreatedBy,
-            CreatedDate = DateTime.UtcNow.ToString("s"),
+            CreatedDate = DateTime.UtcNow,
             IsActive = true,
             IsDeleted = false
         };

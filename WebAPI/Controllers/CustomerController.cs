@@ -2,8 +2,9 @@
 using CrmBackend.Application.Commands.CustomerCommands;
 using CrmBackend.Application.Handlers.CustomerHandlers;
 using Microsoft.AspNetCore.Authorization;
-using CrmBackend.Application.Handlers;
 using CrmBackend.Domain.Enums;
+using CrmBackend.Domain.Constants;
+using CrmBackend.Application.Handlers;
 
 namespace CrmBackend.Web.Controllers;
 
@@ -44,7 +45,7 @@ public class CustomerController : ControllerBase
         _getByAssignHandler = getByAssignHandler;
     }
 
-    [Authorize(Policy = "CanCreateOrUpdate")]
+    [Authorize(Policy = PermissionConstants.Customers.Create)]
     [HttpPost("create")]
     public async Task<IActionResult> Create([FromBody] CreateCustomerCommand command)
     {
@@ -52,7 +53,7 @@ public class CustomerController : ControllerBase
         return Ok(new { CustomerId = id });
     }
 
-    [Authorize(Policy = "CanCreateOrUpdate")]
+    [Authorize(Policy = PermissionConstants.Customers.Edit)]
     [HttpPut("update")]
     public async Task<IActionResult> Update([FromBody] UpdateCustomerCommand command)
     {
@@ -60,7 +61,7 @@ public class CustomerController : ControllerBase
         return Ok(new { Message = "Customer updated successfully" });
     }
 
-    [Authorize(Policy = "CanCreateOrUpdate")]
+    [Authorize(Policy = PermissionConstants.Customers.Edit)]
     [HttpPut("assign")]
     public async Task<IActionResult> Assign([FromBody] UpdateCustomerAssignmentCommand command)
     {
@@ -68,7 +69,7 @@ public class CustomerController : ControllerBase
         return Ok(new { Message = "Customer reassigned successfully" });
     }
 
-    [Authorize(Policy = "CanComment")]
+    [Authorize(Policy = PermissionConstants.CustomerComments.Create)]
     [HttpPost("comment")]
     public async Task<IActionResult> AddComment([FromBody] AddCustomerCommentCommand command)
     {
@@ -76,7 +77,7 @@ public class CustomerController : ControllerBase
         return Ok(new { Message = "Comment added successfully" });
     }
 
-    [Authorize(Policy = "CanView")]
+    [Authorize(Policy = PermissionConstants.Customers.View)]
     [HttpGet("all")]
     public async Task<IActionResult> GetAll()
     {
@@ -84,7 +85,7 @@ public class CustomerController : ControllerBase
         return Ok(result);
     }
 
-    [Authorize(Policy = "CanView")]
+    [Authorize(Policy = PermissionConstants.Customers.View)]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -92,7 +93,7 @@ public class CustomerController : ControllerBase
         return Ok(result);
     }
 
-    [Authorize(Policy = "CanView")]
+    [Authorize(Policy = PermissionConstants.Customers.View)]
     [HttpGet("by-status/{status}")]
     public async Task<IActionResult> GetByContactStatus(int status)
     {
@@ -100,7 +101,7 @@ public class CustomerController : ControllerBase
         return Ok(result);
     }
 
-    [Authorize(Policy = "CanView")]
+    [Authorize(Policy = PermissionConstants.Customers.View)]
     [HttpGet("by-way/{way}")]
     public async Task<IActionResult> GetByWayOfContact(int way)
     {
@@ -108,7 +109,7 @@ public class CustomerController : ControllerBase
         return Ok(result);
     }
 
-    [Authorize(Policy = "CanView")]
+    [Authorize(Policy = PermissionConstants.Customers.View)]
     [HttpGet("by-assigned/{assignedToId}")]
     public async Task<IActionResult> GetByAssignedTo(Guid assignedToId)
     {

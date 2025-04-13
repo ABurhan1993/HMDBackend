@@ -22,7 +22,6 @@ public class RegisterAdminCommandHandler
 
         var user = new User
         {
-            Id = Guid.NewGuid(),
             FullName = command.FullName,
             Email = command.Email,
             RoleId = command.RoleId,

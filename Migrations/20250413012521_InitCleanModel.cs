@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CrmBackend.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitCleanModel : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,7 +20,11 @@ namespace CrmBackend.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -32,7 +36,13 @@ namespace CrmBackend.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false)
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -68,7 +78,13 @@ namespace CrmBackend.Migrations
                     Email = table.Column<string>(type: "character varying(150)", maxLength: 150, nullable: false),
                     PasswordHash = table.Column<string>(type: "text", nullable: false),
                     RoleId = table.Column<Guid>(type: "uuid", nullable: false),
-                    BranchId = table.Column<int>(type: "integer", nullable: false)
+                    BranchId = table.Column<int>(type: "integer", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -101,9 +117,8 @@ namespace CrmBackend.Migrations
                     CustomerCity = table.Column<string>(type: "text", nullable: true),
                     CustomerCountry = table.Column<string>(type: "text", nullable: true),
                     CustomerNationality = table.Column<string>(type: "text", nullable: true),
-                    CustomerNationalId = table.Column<string>(type: "text", nullable: true),
                     CustomerNotes = table.Column<string>(type: "text", nullable: true),
-                    CustomerNextMeetingDate = table.Column<string>(type: "text", nullable: true),
+                    CustomerNextMeetingDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     ContactStatus = table.Column<int>(type: "integer", nullable: false),
                     IsVisitedShowroom = table.Column<bool>(type: "boolean", nullable: true),
                     CustomerTimeSpent = table.Column<int>(type: "integer", nullable: true),
@@ -112,21 +127,18 @@ namespace CrmBackend.Migrations
                     UserId = table.Column<Guid>(type: "uuid", nullable: true),
                     CustomerAssignedTo = table.Column<Guid>(type: "uuid", nullable: true),
                     CustomerAssignedBy = table.Column<Guid>(type: "uuid", nullable: true),
-                    CustomerAssignedDate = table.Column<string>(type: "text", nullable: true),
+                    CustomerAssignedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     IsEscalationRequested = table.Column<bool>(type: "boolean", nullable: true),
                     EscalationRequestedBy = table.Column<Guid>(type: "uuid", nullable: true),
                     EscalationRequestedOn = table.Column<string>(type: "text", nullable: true),
                     EscalatedBy = table.Column<Guid>(type: "uuid", nullable: true),
                     EscalatedOn = table.Column<string>(type: "text", nullable: true),
-                    IsReturnedNotRespondingCustomer = table.Column<bool>(type: "boolean", nullable: true),
-                    IsReturnedNotRespondingCustomerDate = table.Column<string>(type: "text", nullable: true),
-                    IsReturnedBy = table.Column<Guid>(type: "uuid", nullable: true),
-                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedDate = table.Column<string>(type: "text", nullable: true),
-                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: true),
-                    UpdatedDate = table.Column<string>(type: "text", nullable: true),
                     IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -136,12 +148,6 @@ namespace CrmBackend.Migrations
                         column: x => x.BranchId,
                         principalTable: "Branches",
                         principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Customers_Users_CreatedBy",
-                        column: x => x.CreatedBy,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Customers_Users_CustomerAssignedBy",
                         column: x => x.CustomerAssignedBy,
@@ -163,16 +169,6 @@ namespace CrmBackend.Migrations
                         principalTable: "Users",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Customers_Users_IsReturnedBy",
-                        column: x => x.IsReturnedBy,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Customers_Users_UpdatedBy",
-                        column: x => x.UpdatedBy,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Customers_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
@@ -187,10 +183,12 @@ namespace CrmBackend.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     CustomerId = table.Column<int>(type: "integer", nullable: false),
                     BranchId = table.Column<int>(type: "integer", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: true),
-                    CreatedDate = table.Column<string>(type: "text", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdatedBy = table.Column<Guid>(type: "uuid", nullable: true),
-                    UpdatedDate = table.Column<string>(type: "text", nullable: true)
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -210,7 +208,7 @@ namespace CrmBackend.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CustomerComment",
+                name: "CustomerComments",
                 columns: table => new
                 {
                     CustomerCommentId = table.Column<int>(type: "integer", nullable: false)
@@ -218,25 +216,25 @@ namespace CrmBackend.Migrations
                     CustomerCommentDetail = table.Column<string>(type: "text", nullable: false),
                     CustomerId = table.Column<int>(type: "integer", nullable: false),
                     CommentAddedBy = table.Column<Guid>(type: "uuid", nullable: false),
-                    CommentAddedOn = table.Column<string>(type: "text", nullable: true),
-                    CreatedDate = table.Column<string>(type: "text", nullable: true),
-                    CreatedBy = table.Column<int>(type: "integer", nullable: true),
-                    UpdatedDate = table.Column<string>(type: "text", nullable: true),
+                    CommentAddedOn = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedBy = table.Column<Guid>(type: "uuid", nullable: true),
+                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     UpdatedBy = table.Column<Guid>(type: "uuid", nullable: true),
-                    IsActve = table.Column<bool>(type: "boolean", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CustomerComment", x => x.CustomerCommentId);
+                    table.PrimaryKey("PK_CustomerComments", x => x.CustomerCommentId);
                     table.ForeignKey(
-                        name: "FK_CustomerComment_Customers_CustomerId",
+                        name: "FK_CustomerComments_Customers_CustomerId",
                         column: x => x.CustomerId,
                         principalTable: "Customers",
                         principalColumn: "CustomerId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CustomerComment_Users_CommentAddedBy",
+                        name: "FK_CustomerComments_Users_CommentAddedBy",
                         column: x => x.CommentAddedBy,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -254,24 +252,19 @@ namespace CrmBackend.Migrations
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CustomerComment_CommentAddedBy",
-                table: "CustomerComment",
+                name: "IX_CustomerComments_CommentAddedBy",
+                table: "CustomerComments",
                 column: "CommentAddedBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CustomerComment_CustomerId",
-                table: "CustomerComment",
+                name: "IX_CustomerComments_CustomerId",
+                table: "CustomerComments",
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Customers_BranchId",
                 table: "Customers",
                 column: "BranchId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Customers_CreatedBy",
-                table: "Customers",
-                column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Customers_CustomerAssignedBy",
@@ -292,16 +285,6 @@ namespace CrmBackend.Migrations
                 name: "IX_Customers_EscalationRequestedBy",
                 table: "Customers",
                 column: "EscalationRequestedBy");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Customers_IsReturnedBy",
-                table: "Customers",
-                column: "IsReturnedBy");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Customers_UpdatedBy",
-                table: "Customers",
-                column: "UpdatedBy");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Customers_UserId",
@@ -331,7 +314,7 @@ namespace CrmBackend.Migrations
                 name: "CustomerBranch");
 
             migrationBuilder.DropTable(
-                name: "CustomerComment");
+                name: "CustomerComments");
 
             migrationBuilder.DropTable(
                 name: "RoleClaims");

@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CrmBackend.Domain.Common;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CrmBackend.Domain.Entities;
 
-public class CustomerBranch
+public class CustomerBranch: AuditableEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -12,10 +13,6 @@ public class CustomerBranch
     public int CustomerId { get; set; }
     public int BranchId { get; set; }
 
-    public Guid? CreatedBy { get; set; }
-    public string? CreatedDate { get; set; }
-    public Guid? UpdatedBy { get; set; }
-    public string? UpdatedDate { get; set; }
 
     [ForeignKey(nameof(BranchId))]
     public virtual Branch Branch { get; set; }

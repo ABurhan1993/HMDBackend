@@ -1,6 +1,5 @@
 ﻿using CrmBackend.Application.Handlers;
 using CrmBackend.Application.Interfaces;
-using CrmBackend.Application.Services;
 using CrmBackend.Domain.Services;
 using CrmBackend.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -42,17 +41,45 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Authorization Policies
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("CanCreateOrUpdate", policy =>
-        policy.RequireRole(RoleConstants.Admin, RoleConstants.User));
+    // Customers
+    options.AddPolicy(PermissionConstants.Customers.View, policy =>
+        policy.RequireClaim("Permission", PermissionConstants.Customers.View));
+    options.AddPolicy(PermissionConstants.Customers.Create, policy =>
+        policy.RequireClaim("Permission", PermissionConstants.Customers.Create));
+    options.AddPolicy(PermissionConstants.Customers.Edit, policy =>
+        policy.RequireClaim("Permission", PermissionConstants.Customers.Edit));
+    options.AddPolicy(PermissionConstants.Customers.Delete, policy =>
+        policy.RequireClaim("Permission", PermissionConstants.Customers.Delete));
 
-    options.AddPolicy("CanComment", policy =>
-        policy.RequireRole(RoleConstants.Admin, RoleConstants.User));
+    // Users
+    options.AddPolicy(PermissionConstants.Users.View, policy =>
+        policy.RequireClaim("Permission", PermissionConstants.Users.View));
+    options.AddPolicy(PermissionConstants.Users.Create, policy =>
+        policy.RequireClaim("Permission", PermissionConstants.Users.Create));
+    options.AddPolicy(PermissionConstants.Users.Edit, policy =>
+        policy.RequireClaim("Permission", PermissionConstants.Users.Edit));
+    options.AddPolicy(PermissionConstants.Users.Delete, policy =>
+        policy.RequireClaim("Permission", PermissionConstants.Users.Delete));
 
-    options.AddPolicy("CanView", policy =>
-        policy.RequireRole(RoleConstants.Admin, RoleConstants.User, RoleConstants.Designer));
+    // Branches
+    options.AddPolicy(PermissionConstants.Branches.View, policy =>
+        policy.RequireClaim("Permission", PermissionConstants.Branches.View));
+    options.AddPolicy(PermissionConstants.Branches.Create, policy =>
+        policy.RequireClaim("Permission", PermissionConstants.Branches.Create));
+    options.AddPolicy(PermissionConstants.Branches.Edit, policy =>
+        policy.RequireClaim("Permission", PermissionConstants.Branches.Edit));
+    options.AddPolicy(PermissionConstants.Branches.Delete, policy =>
+        policy.RequireClaim("Permission", PermissionConstants.Branches.Delete));
 
-    options.AddPolicy("AdminOnly", policy =>
-        policy.RequireRole(RoleConstants.Admin));
+    // CustomerComments
+    options.AddPolicy(PermissionConstants.CustomerComments.View, policy =>
+        policy.RequireClaim("Permission", PermissionConstants.CustomerComments.View));
+    options.AddPolicy(PermissionConstants.CustomerComments.Create, policy =>
+        policy.RequireClaim("Permission", PermissionConstants.CustomerComments.Create));
+    options.AddPolicy(PermissionConstants.CustomerComments.Edit, policy =>
+        policy.RequireClaim("Permission", PermissionConstants.CustomerComments.Edit));
+    options.AddPolicy(PermissionConstants.CustomerComments.Delete, policy =>
+        policy.RequireClaim("Permission", PermissionConstants.CustomerComments.Delete));
 });
 
 // JWT Authentication
@@ -107,7 +134,7 @@ app.UseAuthorization();
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    await CrmBackend.Infrastructure.Seeding.SeedData.InitializeAsync(services);
+    await SeedData.InitializeAsync(services);
 }
 app.MapControllers();
 

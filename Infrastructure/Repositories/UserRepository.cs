@@ -16,8 +16,9 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> FindByEmailAsync(string email)
     {
-        return await _context.Users.Include(u => u.Role)
-                                   .FirstOrDefaultAsync(u => u.Email == email);
+        return await _context.Users
+        .Include(u => u.Role) // ✅ مهم جداً
+        .FirstOrDefaultAsync(u => u.Email == email && u.IsActive == true && u.IsDeleted == false);
     }
     public async Task<User?> GetByIdAsync(Guid id)
     {

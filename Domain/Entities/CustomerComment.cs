@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CrmBackend.Domain.Common;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CrmBackend.Domain.Entities;
 
-public class CustomerComment
+public class CustomerComment: AuditableEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -15,14 +16,7 @@ public class CustomerComment
     public int CustomerId { get; set; }
     public Guid CommentAddedBy { get; set; }
 
-    public string? CommentAddedOn { get; set; }
-    public string? CreatedDate { get; set; }
-    public Guid? CreatedBy { get; set; }
-    public string? UpdatedDate { get; set; }
-    public Guid? UpdatedBy { get; set; }
-
-    public bool IsActve { get; set; } = true;
-    public bool IsDeleted { get; set; } = false;
+    public DateTime? CommentAddedOn { get; set; }
 
     [ForeignKey(nameof(CommentAddedBy))]
     public virtual User CommentAddedByNavigation { get; set; }

@@ -10,9 +10,8 @@
         public string? CustomerCity { get; set; }
         public string? CustomerCountry { get; set; }
         public string? CustomerNationality { get; set; }
-        public string? CustomerNationalId { get; set; }
         public string? CustomerNotes { get; set; }
-        public string? CustomerNextMeetingDate { get; set; }
+        public DateTime? CustomerNextMeetingDate { get; set; }
         public int ContactStatus { get; set; }
         public bool? IsVisitedShowroom { get; set; }
         public int? CustomerTimeSpent { get; set; }

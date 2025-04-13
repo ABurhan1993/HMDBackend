@@ -34,7 +34,6 @@ public class UpdateCustomerHandler
         customer.CustomerCity = command.CustomerCity;
         customer.CustomerCountry = command.CustomerCountry;
         customer.CustomerNationality = command.CustomerNationality;
-        customer.CustomerNationalId = command.CustomerNationalId;
         customer.CustomerNotes = command.CustomerNotes;
         customer.CustomerNextMeetingDate = command.CustomerNextMeetingDate;
         customer.ContactStatus = (ContactStatus)command.ContactStatus;
@@ -43,7 +42,7 @@ public class UpdateCustomerHandler
         customer.WayOfContact = (WayOfContact)command.WayOfContact;
         customer.CustomerAssignedTo = command.CustomerAssignedTo;
         customer.UpdatedBy = command.UpdatedBy;
-        customer.UpdatedDate = DateTime.UtcNow.ToString("s");
+        customer.UpdatedDate = DateTime.UtcNow;
 
         await _customerRepository.UpdateAsync(customer);
     }

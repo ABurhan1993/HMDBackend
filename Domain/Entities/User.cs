@@ -1,12 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CrmBackend.Domain.Common;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CrmBackend.Domain.Entities;
 
-public class User
+public class User: AuditableEntity
 {
     [Key]
-    public Guid Id { get; set; } = Guid.NewGuid();
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public Guid Id { get; set; }
 
     [Required]
     [MaxLength(100)]
@@ -26,4 +28,5 @@ public class User
     [Required]
     public int BranchId { get; set; }
     public Branch Branch { get; set; }
+
 }

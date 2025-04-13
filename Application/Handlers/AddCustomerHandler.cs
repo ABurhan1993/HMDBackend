@@ -43,11 +43,9 @@ namespace CrmBackend.Application.Handlers
                 CustomerId = command.CustomerId,
                 CustomerCommentDetail = command.CommentDetail,
                 CommentAddedBy = command.CommentAddedBy,
-                CommentAddedOn = DateTime.UtcNow.ToString("s"),
+                CommentAddedOn = DateTime.UtcNow,
                 CreatedBy = command.CommentAddedBy,
-                CreatedDate = DateTime.UtcNow.ToString("s"),
-                IsActve = true,
-                IsDeleted = false
+                CreatedDate = DateTime.UtcNow
             };
 
             await _customerCommentRepository.AddAsync(comment);

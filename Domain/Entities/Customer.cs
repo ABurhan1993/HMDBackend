@@ -1,10 +1,11 @@
-﻿using CrmBackend.Domain.Enums;
+﻿using CrmBackend.Domain.Common;
+using CrmBackend.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CrmBackend.Domain.Entities;
 
-public class Customer
+public class Customer: AuditableEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -20,9 +21,8 @@ public class Customer
     public string? CustomerCity { get; set; }
     public string? CustomerCountry { get; set; }
     public string? CustomerNationality { get; set; }
-    public string? CustomerNationalId { get; set; }
     public string? CustomerNotes { get; set; }
-    public string? CustomerNextMeetingDate { get; set; }
+    public DateTime? CustomerNextMeetingDate { get; set; }
 
     public ContactStatus ContactStatus { get; set; }
     public bool? IsVisitedShowroom { get; set; }
@@ -45,7 +45,7 @@ public class Customer
     public Guid? CustomerAssignedBy { get; set; }
     public virtual User CustomerAssignedByUser { get; set; }
 
-    public string? CustomerAssignedDate { get; set; }
+    public DateTime? CustomerAssignedDate { get; set; }
 
     public bool? IsEscalationRequested { get; set; }
 
@@ -60,28 +60,6 @@ public class Customer
     public virtual User EscalatedByUser { get; set; }
 
     public string? EscalatedOn { get; set; }
-
-    public bool? IsReturnedNotRespondingCustomer { get; set; }
-    public string? IsReturnedNotRespondingCustomerDate { get; set; }
-
-    [ForeignKey("IsReturnedByUser")]
-    public Guid? IsReturnedBy { get; set; }
-    public virtual User IsReturnedByUser { get; set; }
-
-    [ForeignKey("CreatedByUser")]
-    public Guid CreatedBy { get; set; }
-    public virtual User CreatedByUser { get; set; }
-
-    public string? CreatedDate { get; set; }
-
-    [ForeignKey("UpdatedByUser")]
-    public Guid? UpdatedBy { get; set; }
-    public virtual User UpdatedByUser { get; set; }
-
-    public string? UpdatedDate { get; set; }
-
-    public bool IsActive { get; set; } = true;
-    public bool IsDeleted { get; set; } = false;
 
     public virtual ICollection<CustomerBranch> CustomerBranches { get; set; } = new List<CustomerBranch>();
     public virtual ICollection<CustomerComment> CustomerComments { get; set; } = new List<CustomerComment>();

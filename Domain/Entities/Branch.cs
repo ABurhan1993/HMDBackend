@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CrmBackend.Domain.Common;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CrmBackend.Domain.Entities;
 
-public class Branch
+public class Branch: AuditableEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -11,10 +12,7 @@ public class Branch
 
     [Required]
     public string Name { get; set; }
-
-    public bool IsActive { get; set; } = true;
-
-    public bool IsDeleted { get; set; } = false;
+    
 
     public ICollection<User> Users { get; set; } = new List<User>();
     public ICollection<Customer> Customers { get; set; } = new List<Customer>();
