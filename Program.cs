@@ -10,6 +10,7 @@ using CrmBackend.Infrastructure.Data;
 using CrmBackend.Domain.Constants;
 using CrmBackend.Application.Handlers.CustomerHandlers;
 using CrmBackend.Infrastructure.Seeding;
+using CrmBackend.Application.Handlers.UserHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -120,6 +121,7 @@ builder.Services.AddScoped<GetCustomerByIdHandler>();
 builder.Services.AddScoped<GetCustomersByContactStatusHandler>();
 builder.Services.AddScoped<GetCustomersByWayOfContactHandler>();
 builder.Services.AddScoped<GetCustomersByAssignedToIdHandler>();
+builder.Services.AddScoped<GetAllUsersHandler>();
 
 // MVC Controllers
 builder.Services.AddControllers();
