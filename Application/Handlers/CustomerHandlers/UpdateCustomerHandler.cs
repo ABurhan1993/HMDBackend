@@ -35,7 +35,8 @@ public class UpdateCustomerHandler
         customer.CustomerCountry = command.CustomerCountry;
         customer.CustomerNationality = command.CustomerNationality;
         customer.CustomerNotes = command.CustomerNotes;
-        customer.CustomerNextMeetingDate = command.CustomerNextMeetingDate;
+        customer.CustomerNextMeetingDate = command.CustomerNextMeetingDate.HasValue
+            ? DateTime.SpecifyKind(command.CustomerNextMeetingDate.Value, DateTimeKind.Utc) : null;
         customer.ContactStatus = (ContactStatus)command.ContactStatus;
         customer.IsVisitedShowroom = command.IsVisitedShowroom;
         customer.CustomerTimeSpent = command.CustomerTimeSpent;

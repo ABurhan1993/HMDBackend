@@ -54,7 +54,12 @@ public static class SeedData
             var admin = new User
             {
                 FullName = "Super Admin",
+                FirstName = "Super",
+                LastName = "Admin",
                 Email = adminEmail,
+                Phone = "0500000000",
+                UserImageUrl = null,
+                IsNotificationEnabled = true,
                 RoleId = adminRole.Id,
                 BranchId = branch.Id
             };
@@ -65,31 +70,31 @@ public static class SeedData
 
         // ✅ Add permissions to Admin role
         var permissions = new List<string>
-    {
-        // Customers
-        PermissionConstants.Customers.View,
-        PermissionConstants.Customers.Create,
-        PermissionConstants.Customers.Edit,
-        PermissionConstants.Customers.Delete,
+        {
+            // Customers
+            PermissionConstants.Customers.View,
+            PermissionConstants.Customers.Create,
+            PermissionConstants.Customers.Edit,
+            PermissionConstants.Customers.Delete,
 
-        // Users
-        PermissionConstants.Users.View,
-        PermissionConstants.Users.Create,
-        PermissionConstants.Users.Edit,
-        PermissionConstants.Users.Delete,
+            // Users
+            PermissionConstants.Users.View,
+            PermissionConstants.Users.Create,
+            PermissionConstants.Users.Edit,
+            PermissionConstants.Users.Delete,
 
-        // Branches
-        PermissionConstants.Branches.View,
-        PermissionConstants.Branches.Create,
-        PermissionConstants.Branches.Edit,
-        PermissionConstants.Branches.Delete,
+            // Branches
+            PermissionConstants.Branches.View,
+            PermissionConstants.Branches.Create,
+            PermissionConstants.Branches.Edit,
+            PermissionConstants.Branches.Delete,
 
-        // CustomerComments
-        PermissionConstants.CustomerComments.View,
-        PermissionConstants.CustomerComments.Create,
-        PermissionConstants.CustomerComments.Edit,
-        PermissionConstants.CustomerComments.Delete
-    };
+            // CustomerComments
+            PermissionConstants.CustomerComments.View,
+            PermissionConstants.CustomerComments.Create,
+            PermissionConstants.CustomerComments.Edit,
+            PermissionConstants.CustomerComments.Delete
+        };
 
         foreach (var permission in permissions)
         {
@@ -109,6 +114,4 @@ public static class SeedData
 
         await context.SaveChangesAsync();
     }
-
-
 }

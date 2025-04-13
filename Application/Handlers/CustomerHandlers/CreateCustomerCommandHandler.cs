@@ -33,7 +33,8 @@ public class CreateCustomerCommandHandler
             CustomerCountry = command.CustomerCountry,
             CustomerNationality = command.CustomerNationality,
             CustomerNotes = command.CustomerNotes,
-            CustomerNextMeetingDate = command.CustomerNextMeetingDate,
+            CustomerNextMeetingDate = command.CustomerNextMeetingDate.HasValue
+            ? DateTime.SpecifyKind(command.CustomerNextMeetingDate.Value, DateTimeKind.Utc): null,
             ContactStatus = (ContactStatus)command.ContactStatus,
             IsVisitedShowroom = command.IsVisitedShowroom,
             CustomerTimeSpent = command.CustomerTimeSpent,

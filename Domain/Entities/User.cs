@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CrmBackend.Domain.Entities;
 
-public class User: AuditableEntity
+public class User : AuditableEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -13,6 +13,22 @@ public class User: AuditableEntity
     [Required]
     [MaxLength(100)]
     public string FullName { get; set; }
+
+    [Required]
+    [MaxLength(100)]
+    public string FirstName { get; set; }
+
+    [MaxLength(100)]
+    public string? LastName { get; set; }
+
+    [Required]
+    [MaxLength(20)]
+    public string Phone { get; set; }
+
+    [MaxLength(255)]
+    public string? UserImageUrl { get; set; }
+
+    public bool IsNotificationEnabled { get; set; } = true;
 
     [Required]
     [MaxLength(150)]
@@ -28,5 +44,4 @@ public class User: AuditableEntity
     [Required]
     public int BranchId { get; set; }
     public Branch Branch { get; set; }
-
 }

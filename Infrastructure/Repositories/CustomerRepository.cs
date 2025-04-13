@@ -26,7 +26,7 @@ public class CustomerRepository : ICustomerRepository
     {
         return await _context.Customers
             .Include(c => c.Branch)
-            .Include(c => c.CustomerAssignedTo)
+            .Include(c => c.CustomerAssignedToUser)
             .Include(c => c.User)
             .FirstOrDefaultAsync(c => c.CustomerId == id);
     }

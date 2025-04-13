@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using CrmBackend.Domain.Enums;
 using CrmBackend.Domain.Constants;
 using CrmBackend.Application.Handlers;
+using System.Security.Claims;
 
 namespace CrmBackend.Web.Controllers;
 
@@ -16,7 +17,7 @@ public class CustomerController : ControllerBase
     private readonly CreateCustomerCommandHandler _createHandler;
     private readonly UpdateCustomerAssignmentHandler _updateAssignHandler;
     private readonly AddCustomerCommentHandler _addCommentHandler;
-    private readonly UpdateCustomerHandler _updateHandler;
+    private readonly UpdateCustomerHandler _updateCustomerHandler;
     private readonly GetAllCustomersHandler _getAllHandler;
     private readonly GetCustomerByIdHandler _getByIdHandler;
     private readonly GetCustomersByContactStatusHandler _getByStatusHandler;
@@ -27,7 +28,7 @@ public class CustomerController : ControllerBase
         CreateCustomerCommandHandler createHandler,
         UpdateCustomerAssignmentHandler updateAssignHandler,
         AddCustomerCommentHandler addCommentHandler,
-        UpdateCustomerHandler updateHandler,
+        UpdateCustomerHandler updateCustomerHandler,
         GetAllCustomersHandler getAllHandler,
         GetCustomerByIdHandler getByIdHandler,
         GetCustomersByContactStatusHandler getByStatusHandler,
@@ -37,7 +38,7 @@ public class CustomerController : ControllerBase
         _createHandler = createHandler;
         _updateAssignHandler = updateAssignHandler;
         _addCommentHandler = addCommentHandler;
-        _updateHandler = updateHandler;
+        _updateCustomerHandler = updateCustomerHandler;
         _getAllHandler = getAllHandler;
         _getByIdHandler = getByIdHandler;
         _getByStatusHandler = getByStatusHandler;
@@ -49,6 +50,8 @@ public class CustomerController : ControllerBase
     [HttpPost("create")]
     public async Task<IActionResult> Create([FromBody] CreateCustomerCommand command)
     {
+        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        command.CreatedBy = userId;
         var id = await _createHandler.Handle(command);
         return Ok(new { CustomerId = id });
     }
@@ -57,9 +60,15 @@ public class CustomerController : ControllerBase
     [HttpPut("update")]
     public async Task<IActionResult> Update([FromBody] UpdateCustomerCommand command)
     {
-        await _updateHandler.Handle(command);
-        return Ok(new { Message = "Customer updated successfully" });
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId)) return Unauthorized();
+
+        command.UpdatedBy = Guid.Parse(userId);
+
+        await _updateCustomerHandler.Handle(command);
+        return Ok();
     }
+
 
     [Authorize(Policy = PermissionConstants.Customers.Edit)]
     [HttpPut("assign")]
