@@ -21,7 +21,8 @@ public class UserController : ControllerBase
     [HttpGet("all-users")]
     public async Task<IActionResult> GetAllUsers()
     {
-        var result = await _getAllUsersHandler.Handle();
+        var branchId = int.Parse(User.FindFirst("BranchId")!.Value);
+        var result = await _getAllUsersHandler.Handle(branchId);
         return Ok(result);
     }
 
