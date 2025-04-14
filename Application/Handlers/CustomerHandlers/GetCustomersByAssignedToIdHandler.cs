@@ -13,15 +13,16 @@ public class GetCustomersByAssignedToIdHandler
         _customerRepository = customerRepository;
     }
 
-    public async Task<IEnumerable<CustomerDto>> Handle(Guid userId)
+    public async Task<IEnumerable<CustomerDto>> Handle(Guid userId, int branchId)
     {
         var customers = await _customerRepository
             .Query()
-            .Where(c => c.CustomerAssignedTo == userId)
+            .Where(c => c.CustomerAssignedTo == userId && c.BranchId == branchId && !c.IsDeleted && c.IsActive)
             .Include(c => c.Branch)
             .Include(c => c.CustomerAssignedToUser)
             .ToListAsync();
 
         return customers.Select(CustomerDto.FromEntity);
     }
+
 }

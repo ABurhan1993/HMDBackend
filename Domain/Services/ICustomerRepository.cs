@@ -14,4 +14,7 @@ public interface ICustomerRepository
     Task<IEnumerable<Customer>> GetByWayOfContactAsync(WayOfContact way);
     Task<IEnumerable<Customer>> GetByAssignedToIdAsync(Guid userId);
     IQueryable<Customer> Query();
+    Task SoftDeleteAsync(int customerId, Guid deletedBy);
+    Task<IEnumerable<Customer>> GetUpcomingMeetingsAsync();
+
 }

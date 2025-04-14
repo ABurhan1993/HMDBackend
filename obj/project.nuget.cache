@@ -1,10 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "t6LeDWYBVd77lYuUV0Hq0fjVRLuiV7NY2ms+eyxEtpuM+5/ePd8gbsJtWiXIXkDxNpBi7fRzpZ6OZpDlJZZRnw==",
+  "dgSpecHash": "2evyBxxzj8/nqG41J1FHmlb0YofrEXHz4khOyBmqVMXGRobHgZmRpUs7OSQUizO7AzyneaIKP1q4lJmHlL9y5g==",
   "success": true,
   "projectFilePath": "C:\\Users\\SAI Kitchen\\Desktop\\MhdCRM\\CrmBackend\\CrmBackend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\SAI Kitchen\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
+    "C:\\Users\\SAI Kitchen\\.nuget\\packages\\mediatr\\12.0.1\\mediatr.12.0.1.nupkg.sha512",
+    "C:\\Users\\SAI Kitchen\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
     "C:\\Users\\SAI Kitchen\\.nuget\\packages\\microsoft.aspnetcore.authentication.jwtbearer\\6.0.0\\microsoft.aspnetcore.authentication.jwtbearer.6.0.0.nupkg.sha512",
     "C:\\Users\\SAI Kitchen\\.nuget\\packages\\microsoft.aspnetcore.openapi\\8.0.0\\microsoft.aspnetcore.openapi.8.0.0.nupkg.sha512",
     "C:\\Users\\SAI Kitchen\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\7.0.0\\microsoft.bcl.asyncinterfaces.7.0.0.nupkg.sha512",

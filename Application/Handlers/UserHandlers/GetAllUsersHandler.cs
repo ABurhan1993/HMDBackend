@@ -1,5 +1,6 @@
-﻿using CrmBackend.Application.DTOs.UsersDtos;
-using CrmBackend.Domain.Services;
+﻿using CrmBackend.Domain.Services;
+using Microsoft.EntityFrameworkCore;
+using CrmBackend.Application.DTOs.UserDTOs;
 
 namespace CrmBackend.Application.Handlers.UserHandlers;
 
@@ -12,16 +13,14 @@ public class GetAllUsersHandler
         _userRepository = userRepository;
     }
 
-    public async Task<IEnumerable<UserSelectDto>> Handle()
+    public async Task<IEnumerable<UserDto>> Handle()
     {
-        var users = await _userRepository.GetAllAsync();
-        return users
+        var users = await _userRepository.Query()
+            .Include(u => u.Role)
+            .Include(u => u.Branch)
             .Where(u => u.IsActive && !u.IsDeleted)
-            .Select(u => new UserSelectDto
-            {
-                Value = u.Id,
-                Label = u.FullName
-            });
+            .ToListAsync();
+
+        return users.Select(UserDto.FromEntity);
     }
 }
-

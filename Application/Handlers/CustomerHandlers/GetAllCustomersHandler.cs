@@ -13,14 +13,16 @@ public class GetAllCustomersHandler
         _customerRepository = customerRepository;
     }
 
-    public async Task<IEnumerable<CustomerDto>> Handle()
+    public async Task<IEnumerable<CustomerDto>> Handle(int branchId)
     {
         var customers = await _customerRepository
             .Query()
             .Include(c => c.Branch)
             .Include(c => c.CustomerAssignedToUser)
+            .Where(c => c.BranchId == branchId && c.IsActive && !c.IsDeleted)
             .ToListAsync();
 
         return customers.Select(CustomerDto.FromEntity);
     }
+
 }

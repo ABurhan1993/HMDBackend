@@ -8,9 +8,16 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using CrmBackend.Infrastructure.Data;
 using CrmBackend.Domain.Constants;
-using CrmBackend.Application.Handlers.CustomerHandlers;
 using CrmBackend.Infrastructure.Seeding;
+using CrmBackend.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+
+// Handlers
+using CrmBackend.Application.Handlers.CustomerHandlers;
 using CrmBackend.Application.Handlers.UserHandlers;
+using CrmBackend.Application.Handlers.BranchHandlers;
+using CrmBackend.Application.Handlers.RoleHandlers;
+using CrmBackend.Application.CustomerHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,11 +28,6 @@ builder.Services.AddSwaggerGen();
 // CORS
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(builder =>
-    {
-        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
-    });
-
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins("http://localhost:3000", "http://localhost:5173", "https://mhdcrm.onrender.com")
@@ -42,45 +44,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Authorization Policies
 builder.Services.AddAuthorization(options =>
 {
-    // Customers
-    options.AddPolicy(PermissionConstants.Customers.View, policy =>
-        policy.RequireClaim("Permission", PermissionConstants.Customers.View));
-    options.AddPolicy(PermissionConstants.Customers.Create, policy =>
-        policy.RequireClaim("Permission", PermissionConstants.Customers.Create));
-    options.AddPolicy(PermissionConstants.Customers.Edit, policy =>
-        policy.RequireClaim("Permission", PermissionConstants.Customers.Edit));
-    options.AddPolicy(PermissionConstants.Customers.Delete, policy =>
-        policy.RequireClaim("Permission", PermissionConstants.Customers.Delete));
-
-    // Users
-    options.AddPolicy(PermissionConstants.Users.View, policy =>
-        policy.RequireClaim("Permission", PermissionConstants.Users.View));
-    options.AddPolicy(PermissionConstants.Users.Create, policy =>
-        policy.RequireClaim("Permission", PermissionConstants.Users.Create));
-    options.AddPolicy(PermissionConstants.Users.Edit, policy =>
-        policy.RequireClaim("Permission", PermissionConstants.Users.Edit));
-    options.AddPolicy(PermissionConstants.Users.Delete, policy =>
-        policy.RequireClaim("Permission", PermissionConstants.Users.Delete));
-
-    // Branches
-    options.AddPolicy(PermissionConstants.Branches.View, policy =>
-        policy.RequireClaim("Permission", PermissionConstants.Branches.View));
-    options.AddPolicy(PermissionConstants.Branches.Create, policy =>
-        policy.RequireClaim("Permission", PermissionConstants.Branches.Create));
-    options.AddPolicy(PermissionConstants.Branches.Edit, policy =>
-        policy.RequireClaim("Permission", PermissionConstants.Branches.Edit));
-    options.AddPolicy(PermissionConstants.Branches.Delete, policy =>
-        policy.RequireClaim("Permission", PermissionConstants.Branches.Delete));
-
-    // CustomerComments
-    options.AddPolicy(PermissionConstants.CustomerComments.View, policy =>
-        policy.RequireClaim("Permission", PermissionConstants.CustomerComments.View));
-    options.AddPolicy(PermissionConstants.CustomerComments.Create, policy =>
-        policy.RequireClaim("Permission", PermissionConstants.CustomerComments.Create));
-    options.AddPolicy(PermissionConstants.CustomerComments.Edit, policy =>
-        policy.RequireClaim("Permission", PermissionConstants.CustomerComments.Edit));
-    options.AddPolicy(PermissionConstants.CustomerComments.Delete, policy =>
-        policy.RequireClaim("Permission", PermissionConstants.CustomerComments.Delete));
+    var permissions = PermissionConstants.All;
+    foreach (var permission in permissions)
+    {
+        options.AddPolicy(permission, policy => policy.RequireClaim("Permission", permission));
+    }
 });
 
 // JWT Authentication
@@ -103,9 +71,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerCommentRepository, CustomerCommentRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IBranchRepository, BranchRepository>();
 
 // Services
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
 // Handlers
 builder.Services.AddScoped<LoginCommandHandler>();
@@ -115,15 +86,27 @@ builder.Services.AddScoped<CreateCustomerCommandHandler>();
 builder.Services.AddScoped<UpdateCustomerHandler>();
 builder.Services.AddScoped<UpdateCustomerAssignmentHandler>();
 builder.Services.AddScoped<AddCustomerCommentHandler>();
+builder.Services.AddScoped<DeleteCustomerHandler>();
 
 builder.Services.AddScoped<GetAllCustomersHandler>();
 builder.Services.AddScoped<GetCustomerByIdHandler>();
 builder.Services.AddScoped<GetCustomersByContactStatusHandler>();
 builder.Services.AddScoped<GetCustomersByWayOfContactHandler>();
 builder.Services.AddScoped<GetCustomersByAssignedToIdHandler>();
-builder.Services.AddScoped<GetAllUsersHandler>();
+builder.Services.AddScoped<GetCustomersWithUpcomingMeetingsHandler>();
 
-// MVC Controllers
+builder.Services.AddScoped<GetAllUsersHandler>();
+builder.Services.AddScoped<CreateUserCommandHandler>();
+
+builder.Services.AddScoped<CreateBranchCommandHandler>();
+builder.Services.AddScoped<UpdateBranchCommandHandler>();
+builder.Services.AddScoped<GetAllBranchesHandler>();
+
+builder.Services.AddScoped<CreateRoleCommandHandler>();
+builder.Services.AddScoped<UpdateRoleCommandHandler>();
+builder.Services.AddScoped<GetAllRolesHandler>();
+
+// Controllers
 builder.Services.AddControllers();
 
 var app = builder.Build();
@@ -133,12 +116,13 @@ app.UseRouting();
 app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Seed Data
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     await SeedData.InitializeAsync(services);
 }
-app.MapControllers();
 
 // Swagger UI
 if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
@@ -146,10 +130,6 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    await SeedData.InitializeAsync(services);
-}
 
+app.MapControllers();
 app.Run();

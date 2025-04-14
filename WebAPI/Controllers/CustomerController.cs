@@ -6,6 +6,7 @@ using CrmBackend.Domain.Enums;
 using CrmBackend.Domain.Constants;
 using CrmBackend.Application.Handlers;
 using System.Security.Claims;
+using CrmBackend.Application.CustomerHandlers;
 
 namespace CrmBackend.Web.Controllers;
 
@@ -23,6 +24,7 @@ public class CustomerController : ControllerBase
     private readonly GetCustomersByContactStatusHandler _getByStatusHandler;
     private readonly GetCustomersByWayOfContactHandler _getByWayHandler;
     private readonly GetCustomersByAssignedToIdHandler _getByAssignHandler;
+    private readonly DeleteCustomerHandler _deleteCustomerHandler;
 
     public CustomerController(
         CreateCustomerCommandHandler createHandler,
@@ -33,7 +35,8 @@ public class CustomerController : ControllerBase
         GetCustomerByIdHandler getByIdHandler,
         GetCustomersByContactStatusHandler getByStatusHandler,
         GetCustomersByWayOfContactHandler getByWayHandler,
-        GetCustomersByAssignedToIdHandler getByAssignHandler)
+        GetCustomersByAssignedToIdHandler getByAssignHandler,
+        DeleteCustomerHandler deleteCustomerHandler)
     {
         _createHandler = createHandler;
         _updateAssignHandler = updateAssignHandler;
@@ -44,6 +47,7 @@ public class CustomerController : ControllerBase
         _getByStatusHandler = getByStatusHandler;
         _getByWayHandler = getByWayHandler;
         _getByAssignHandler = getByAssignHandler;
+        _deleteCustomerHandler = deleteCustomerHandler;
     }
 
     [Authorize(Policy = PermissionConstants.Customers.Create)]
@@ -90,7 +94,8 @@ public class CustomerController : ControllerBase
     [HttpGet("all")]
     public async Task<IActionResult> GetAll()
     {
-        var result = await _getAllHandler.Handle();
+        var branchId = int.Parse(User.FindFirst("BranchId")!.Value);
+        var result = await _getAllHandler.Handle(branchId);
         return Ok(result);
     }
 
@@ -106,23 +111,57 @@ public class CustomerController : ControllerBase
     [HttpGet("by-status/{status}")]
     public async Task<IActionResult> GetByContactStatus(int status)
     {
-        var result = await _getByStatusHandler.Handle((ContactStatus)status);
+        var branchId = int.Parse(User.FindFirst("BranchId")!.Value);
+        var result = await _getByStatusHandler.Handle((ContactStatus)status, branchId);
         return Ok(result);
     }
+
 
     [Authorize(Policy = PermissionConstants.Customers.View)]
     [HttpGet("by-way/{way}")]
     public async Task<IActionResult> GetByWayOfContact(int way)
     {
-        var result = await _getByWayHandler.Handle((WayOfContact)way);
+        var branchId = int.Parse(User.FindFirst("BranchId")!.Value);
+        var result = await _getByWayHandler.Handle((WayOfContact)way, branchId);
         return Ok(result);
     }
+
 
     [Authorize(Policy = PermissionConstants.Customers.View)]
     [HttpGet("by-assigned/{assignedToId}")]
     public async Task<IActionResult> GetByAssignedTo(Guid assignedToId)
     {
-        var result = await _getByAssignHandler.Handle(assignedToId);
+        var branchId = int.Parse(User.FindFirst("BranchId")!.Value);
+        var result = await _getByAssignHandler.Handle(assignedToId, branchId);
         return Ok(result);
     }
+
+
+    [HttpDelete("{id}")]
+    [Authorize(Policy = PermissionConstants.Customers.Delete)]
+    public async Task<IActionResult> Delete([FromQuery]int id)
+    {
+        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);// استخرج من التوكن
+        var command = new DeleteCustomerCommand
+        {
+            CustomerId = id,
+            DeletedBy = userId
+        };
+
+        await _deleteCustomerHandler.Handle(command);
+        return Ok();
+    }
+
+    [HttpGet("calendar-events")]
+    [Authorize(Policy = PermissionConstants.Customers.View)]
+    public async Task<IActionResult> GetCalendarEvents([FromServices] GetCustomersWithUpcomingMeetingsHandler handler)
+    {
+        var branchId = int.Parse(User.FindFirst("BranchId")!.Value);
+        var result = await handler.HandleAsync(branchId);
+        return Ok(result);
+    }
+
+
+
+
 }

@@ -14,15 +14,16 @@ public class GetCustomersByContactStatusHandler
         _customerRepository = customerRepository;
     }
 
-    public async Task<IEnumerable<CustomerDto>> Handle(ContactStatus status)
+    public async Task<IEnumerable<CustomerDto>> Handle(ContactStatus status, int branchId)
     {
         var customers = await _customerRepository
             .Query()
-            .Where(c => c.ContactStatus == status)
+            .Where(c => c.ContactStatus == status && c.BranchId == branchId && !c.IsDeleted && c.IsActive)
             .Include(c => c.Branch)
             .Include(c => c.CustomerAssignedToUser)
             .ToListAsync();
 
         return customers.Select(CustomerDto.FromEntity);
     }
+
 }

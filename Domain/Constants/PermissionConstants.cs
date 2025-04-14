@@ -8,6 +8,8 @@ public static class PermissionConstants
         public const string Create = "Permissions.Customers.Create";
         public const string Edit = "Permissions.Customers.Edit";
         public const string Delete = "Permissions.Customers.Delete";
+
+        public static readonly string[] All = { View, Create, Edit, Delete };
     }
 
     public static class Users
@@ -16,6 +18,8 @@ public static class PermissionConstants
         public const string Create = "Permissions.Users.Create";
         public const string Edit = "Permissions.Users.Edit";
         public const string Delete = "Permissions.Users.Delete";
+
+        public static readonly string[] All = { View, Create, Edit, Delete };
     }
 
     public static class Branches
@@ -24,6 +28,18 @@ public static class PermissionConstants
         public const string Create = "Permissions.Branches.Create";
         public const string Edit = "Permissions.Branches.Edit";
         public const string Delete = "Permissions.Branches.Delete";
+
+        public static readonly string[] All = { View, Create, Edit, Delete };
+    }
+
+    public static class Roles
+    {
+        public const string View = "Permissions.Roles.View";
+        public const string Create = "Permissions.Roles.Create";
+        public const string Edit = "Permissions.Roles.Edit";
+        public const string Delete = "Permissions.Roles.Delete";
+
+        public static readonly string[] All = { View, Create, Edit, Delete };
     }
 
     public static class CustomerComments
@@ -32,6 +48,16 @@ public static class PermissionConstants
         public const string Create = "Permissions.CustomerComments.Create";
         public const string Edit = "Permissions.CustomerComments.Edit";
         public const string Delete = "Permissions.CustomerComments.Delete";
+
+        public static readonly string[] All = { View, Create, Edit, Delete };
     }
-    // أضف المزيد حسب الحاجة
+
+    // ✅ جمع كل الصلاحيات العامة
+    public static readonly string[] All =
+        Customers.All
+        .Concat(Users.All)
+        .Concat(Branches.All)
+        .Concat(Roles.All)
+        .Concat(CustomerComments.All)
+        .ToArray();
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using CrmBackend.Application.Handlers.UserHandlers;
+using CrmBackend.Application.UserCommands;
+using System.Security.Claims;
 
 namespace CrmBackend.Web.Controllers;
 
@@ -21,5 +23,15 @@ public class UserController : ControllerBase
     {
         var result = await _getAllUsersHandler.Handle();
         return Ok(result);
+    }
+
+    [HttpPost("create")]
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserCommand command, [FromServices] CreateUserCommandHandler handler)
+    {
+        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        command.CreatedBy = userId;
+
+        var newUserId = await handler.Handle(command);
+        return Ok(new { UserId = newUserId });
     }
 }

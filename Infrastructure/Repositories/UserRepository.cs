@@ -31,6 +31,15 @@ public class UserRepository : IUserRepository
             .Where(u => u.IsActive && !u.IsDeleted)
             .ToListAsync();
     }
+    public async Task AddAsync(User user)
+    {
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+    }
+    public IQueryable<User> Query()
+    {
+        return _context.Users.AsQueryable();
+    }
 
 
 }

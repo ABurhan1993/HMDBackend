@@ -14,15 +14,16 @@ public class GetCustomersByWayOfContactHandler
         _customerRepository = customerRepository;
     }
 
-    public async Task<IEnumerable<CustomerDto>> Handle(WayOfContact way)
+    public async Task<IEnumerable<CustomerDto>> Handle(WayOfContact way, int branchId)
     {
         var customers = await _customerRepository
             .Query()
-            .Where(c => c.WayOfContact == way)
+            .Where(c => c.WayOfContact == way && c.BranchId == branchId && !c.IsDeleted && c.IsActive)
             .Include(c => c.Branch)
             .Include(c => c.CustomerAssignedToUser)
             .ToListAsync();
 
         return customers.Select(CustomerDto.FromEntity);
     }
+
 }

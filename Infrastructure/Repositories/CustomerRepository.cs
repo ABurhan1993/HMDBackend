@@ -39,7 +39,7 @@ public class CustomerRepository : ICustomerRepository
 
     public async Task<IEnumerable<Customer>> GetAllAsync()
     {
-        return await _context.Customers.ToListAsync();
+        return await _context.Customers.Where(c => c.IsActive == true && c.IsDeleted == false).ToListAsync();
     }
 
     public async Task DeleteAsync(int id)
@@ -75,5 +75,25 @@ public class CustomerRepository : ICustomerRepository
     {
         return _context.Customers.AsQueryable();
     }
+    public async Task SoftDeleteAsync(int customerId, Guid deletedBy)
+    {
+        var customer = await _context.Customers.FindAsync(customerId);
+        if (customer == null) return;
+
+        customer.IsDeleted = true;
+        customer.UpdatedBy = deletedBy;
+        customer.UpdatedDate = DateTime.UtcNow;
+
+        _context.Customers.Update(customer);
+        await _context.SaveChangesAsync();
+    }
+    public async Task<IEnumerable<Customer>> GetUpcomingMeetingsAsync()
+    {
+        return await _context.Customers
+            .Include(c => c.CustomerAssignedToUser)
+            .Where(c => c.CustomerNextMeetingDate != null && !c.IsDeleted)
+            .ToListAsync();
+    }
+
 
 }
