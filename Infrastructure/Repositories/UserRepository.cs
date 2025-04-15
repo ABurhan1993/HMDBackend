@@ -40,6 +40,11 @@ public class UserRepository : IUserRepository
     {
         return _context.Users.AsQueryable();
     }
-
+    public async Task<List<User>> GetUsersByBranchIdAsync(int branchId)
+    {
+        return await _context.Users
+            .Where(u => u.BranchId == branchId && !u.IsDeleted && u.IsActive)
+            .ToListAsync();
+    }
 
 }

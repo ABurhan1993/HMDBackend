@@ -9,6 +9,6 @@ public interface IUserRepository
     Task<List<User>> GetAllAsync();
     Task AddAsync(User user);
     IQueryable<User> Query();
-
+    Task<List<User>> GetUsersByBranchIdAsync(int branchId);
 
 }

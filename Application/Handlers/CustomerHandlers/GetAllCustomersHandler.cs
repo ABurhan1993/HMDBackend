@@ -20,9 +20,11 @@ public class GetAllCustomersHandler
             .Include(c => c.Branch)
             .Include(c => c.CustomerAssignedToUser)
             .Where(c => c.BranchId == branchId && c.IsActive && !c.IsDeleted)
+            .OrderByDescending(c => c.CreatedDate) // 👈 الترتيب هنا
             .ToListAsync();
 
         return customers.Select(CustomerDto.FromEntity);
     }
+
 
 }

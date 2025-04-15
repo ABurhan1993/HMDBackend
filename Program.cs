@@ -105,6 +105,7 @@ builder.Services.AddScoped<GetAllBranchesHandler>();
 builder.Services.AddScoped<CreateRoleCommandHandler>();
 builder.Services.AddScoped<UpdateRoleCommandHandler>();
 builder.Services.AddScoped<GetAllRolesHandler>();
+builder.Services.AddScoped<GetUsersByBranchIdHandler>();
 
 // Controllers
 builder.Services.AddControllers();
