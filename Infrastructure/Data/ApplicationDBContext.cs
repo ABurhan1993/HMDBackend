@@ -14,11 +14,13 @@ public class ApplicationDbContext : DbContext
     public DbSet<Branch> Branches => Set<Branch>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<CustomerComment> CustomerComments => Set<CustomerComment>();
+    public DbSet<UserClaim> UserClaims { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
+        modelBuilder.Entity<UserClaim>().ToTable("UserClaims");
         // لا يوجد HasData هنا، كل الـ Seeding يتم عبر SeedData.InitializeAsync()
     }
 }

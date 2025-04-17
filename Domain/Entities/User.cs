@@ -44,4 +44,7 @@ public class User : AuditableEntity
     [Required]
     public int BranchId { get; set; }
     public Branch Branch { get; set; }
+
+    public ICollection<UserClaim> Claims { get; set; } = new List<UserClaim>();
+
 }

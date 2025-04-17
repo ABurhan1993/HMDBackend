@@ -16,10 +16,15 @@ public class UserRepository : IUserRepository
 
     public async Task<User?> FindByEmailAsync(string email)
     {
+        var loweredEmail = email.ToLower();
         return await _context.Users
-        .Include(u => u.Role) // ✅ مهم جداً
-        .FirstOrDefaultAsync(u => u.Email == email && u.IsActive == true && u.IsDeleted == false);
+            .Include(u => u.Role)
+            .FirstOrDefaultAsync(u =>
+                u.Email.ToLower() == loweredEmail &&
+                u.IsActive &&
+                !u.IsDeleted);
     }
+
     public async Task<User?> GetByIdAsync(Guid id)
     {
         return await _context.Users.FindAsync(id);

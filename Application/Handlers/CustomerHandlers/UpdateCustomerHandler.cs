@@ -44,6 +44,12 @@ public class UpdateCustomerHandler
         customer.CustomerAssignedTo = command.CustomerAssignedTo;
         customer.UpdatedBy = command.UpdatedBy;
         customer.UpdatedDate = DateTime.UtcNow;
+        if (command.CustomerAssignedTo != null || customer.CustomerAssignedTo!= command.CustomerAssignedTo)
+        {
+            customer.CustomerAssignedBy = command.UpdatedBy; // استخرجناه من الـ token
+            customer.CustomerAssignedDate = DateTime.UtcNow;
+        }
+
 
         await _customerRepository.UpdateAsync(customer);
     }

@@ -18,6 +18,7 @@ using CrmBackend.Application.Handlers.UserHandlers;
 using CrmBackend.Application.Handlers.BranchHandlers;
 using CrmBackend.Application.Handlers.RoleHandlers;
 using CrmBackend.Application.CustomerHandlers;
+using CrmBackend.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -77,6 +78,8 @@ builder.Services.AddScoped<IBranchRepository, BranchRepository>();
 // Services
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddScoped<PermissionHelper>();
+
 
 // Handlers
 builder.Services.AddScoped<LoginCommandHandler>();

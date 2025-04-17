@@ -68,48 +68,23 @@ public static class SeedData
             context.Users.Add(admin);
         }
 
-        // ✅ Add permissions to Admin role
-        var permissions = new List<string>
+        // ✅ Add missing permissions to Admin role
+        var existingClaims = await context.RoleClaims
+            .Where(rc => rc.RoleId == adminRole.Id)
+            .Select(rc => rc.Value)
+            .ToListAsync();
+
+        var allPermissions = PermissionConstants.All;
+        var newPermissions = allPermissions.Except(existingClaims);
+
+        foreach (var permission in newPermissions)
         {
-            // Customers
-            PermissionConstants.Customers.View,
-            PermissionConstants.Customers.Create,
-            PermissionConstants.Customers.Edit,
-            PermissionConstants.Customers.Delete,
-
-            // Users
-            PermissionConstants.Users.View,
-            PermissionConstants.Users.Create,
-            PermissionConstants.Users.Edit,
-            PermissionConstants.Users.Delete,
-
-            // Branches
-            PermissionConstants.Branches.View,
-            PermissionConstants.Branches.Create,
-            PermissionConstants.Branches.Edit,
-            PermissionConstants.Branches.Delete,
-
-            // CustomerComments
-            PermissionConstants.CustomerComments.View,
-            PermissionConstants.CustomerComments.Create,
-            PermissionConstants.CustomerComments.Edit,
-            PermissionConstants.CustomerComments.Delete
-        };
-
-        foreach (var permission in permissions)
-        {
-            var exists = await context.RoleClaims
-                .AnyAsync(rc => rc.RoleId == adminRole.Id && rc.Type == "Permission" && rc.Value == permission);
-
-            if (!exists)
+            context.RoleClaims.Add(new RoleClaim
             {
-                context.RoleClaims.Add(new RoleClaim
-                {
-                    RoleId = adminRole.Id,
-                    Type = "Permission",
-                    Value = permission
-                });
-            }
+                RoleId = adminRole.Id,
+                Type = "Permission",
+                Value = permission
+            });
         }
 
         await context.SaveChangesAsync();

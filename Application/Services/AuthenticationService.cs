@@ -18,28 +18,24 @@ public class AuthenticationService : IAuthenticationService
         _context = context;
     }
 
-    public string GenerateToken(User user)
+    public string GenerateToken(User user, List<string> permissions)
     {
-        var roleClaims = _context.RoleClaims
-            .Where(rc => rc.RoleId == user.RoleId && rc.Type == "Permission")
-            .Select(rc => rc.Value)
-            .ToList();
-
         var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim("FirstName", user.FirstName),
-            new Claim("LastName", user.LastName ?? ""),
-            new Claim("Name", user.FullName),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim("Phone", user.Phone),
-            new Claim("UserImageUrl", user.UserImageUrl ?? ""),
-            new Claim("IsNotificationEnabled", user.IsNotificationEnabled.ToString()),
-            new Claim(ClaimTypes.Role, user.Role?.Name ?? "User"),
-            new Claim("BranchId", user.BranchId.ToString())
-        };
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim("FirstName", user.FirstName),
+        new Claim("LastName", user.LastName ?? ""),
+        new Claim("Name", user.FullName),
+        new Claim(ClaimTypes.Email, user.Email),
+        new Claim("Phone", user.Phone),
+        new Claim("UserImageUrl", user.UserImageUrl ?? ""),
+        new Claim("IsNotificationEnabled", user.IsNotificationEnabled.ToString()),
+        new Claim(ClaimTypes.Role, user.Role?.Name ?? "User"),
+        new Claim("BranchId", user.BranchId.ToString())
+    };
 
-        claims.AddRange(roleClaims.Select(p => new Claim("Permission", p)));
+        // ✅ أضف كل الصلاحيات كـ Claims
+        claims.AddRange(permissions.Select(p => new Claim("Permission", p)));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -55,3 +51,4 @@ public class AuthenticationService : IAuthenticationService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }
+

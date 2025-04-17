@@ -42,10 +42,14 @@ public class CreateCustomerCommandHandler
             BranchId = user.BranchId,
             UserId = user.Id,
             CustomerAssignedTo = command.CustomerAssignedTo,
+            CustomerAssignedBy = command.CreatedBy,
+            CustomerAssignedDate = DateTime.UtcNow,
             CreatedBy = command.CreatedBy,
             CreatedDate = DateTime.UtcNow,
             IsActive = true,
-            IsDeleted = false
+            IsDeleted = false,
+            
+
         };
 
         await _customerRepository.AddAsync(customer);

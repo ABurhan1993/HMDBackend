@@ -7,6 +7,8 @@ using CrmBackend.Domain.Constants;
 using CrmBackend.Application.Handlers;
 using System.Security.Claims;
 using CrmBackend.Application.CustomerHandlers;
+using CrmBackend.Application.DTOs.CustomersDTOs;
+using CrmBackend.Domain.Services;
 
 namespace CrmBackend.Web.Controllers;
 
@@ -25,7 +27,7 @@ public class CustomerController : ControllerBase
     private readonly GetCustomersByWayOfContactHandler _getByWayHandler;
     private readonly GetCustomersByAssignedToIdHandler _getByAssignHandler;
     private readonly DeleteCustomerHandler _deleteCustomerHandler;
-
+    private readonly ICustomerCommentRepository _customerCommentRepository;
     public CustomerController(
         CreateCustomerCommandHandler createHandler,
         UpdateCustomerAssignmentHandler updateAssignHandler,
@@ -36,7 +38,8 @@ public class CustomerController : ControllerBase
         GetCustomersByContactStatusHandler getByStatusHandler,
         GetCustomersByWayOfContactHandler getByWayHandler,
         GetCustomersByAssignedToIdHandler getByAssignHandler,
-        DeleteCustomerHandler deleteCustomerHandler)
+        DeleteCustomerHandler deleteCustomerHandler,
+        ICustomerCommentRepository customerCommentRepository)
     {
         _createHandler = createHandler;
         _updateAssignHandler = updateAssignHandler;
@@ -48,6 +51,7 @@ public class CustomerController : ControllerBase
         _getByWayHandler = getByWayHandler;
         _getByAssignHandler = getByAssignHandler;
         _deleteCustomerHandler = deleteCustomerHandler;
+        _customerCommentRepository = customerCommentRepository;
     }
 
     [Authorize(Policy = PermissionConstants.Customers.Create)]
@@ -83,9 +87,11 @@ public class CustomerController : ControllerBase
     }
 
     [Authorize(Policy = PermissionConstants.CustomerComments.Create)]
-    [HttpPost("comment")]
+    [HttpPost("add-comment")]
     public async Task<IActionResult> AddComment([FromBody] AddCustomerCommentCommand command)
     {
+        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        command.CommentAddedBy = userId;
         await _addCommentHandler.Handle(command);
         return Ok(new { Message = "Comment added successfully" });
     }
@@ -162,6 +168,23 @@ public class CustomerController : ControllerBase
     }
 
 
+    [HttpGet("comments/{customerId}")]
+    public async Task<IActionResult> GetCustomerComments(int customerId)
+    {
+        var comments = await _customerCommentRepository.GetByCustomerIdAsync(customerId);
+
+        var result = comments
+            .OrderByDescending(c => c.CreatedDate)
+            .Select(c => new CustomerCommentDto
+            {
+                Comment = c.CustomerCommentDetail,
+                CreatedDate = (DateTime)c.CreatedDate,
+                AddedBy = c.CommentAddedByNavigation.FullName,
+            })
+            .ToList();
+
+        return Ok(result);
+    }
 
 
 }

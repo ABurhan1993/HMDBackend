@@ -31,6 +31,20 @@ namespace CrmBackend.Application.DTOs.CustomersDTOs
         public int? BranchId { get; set; }
         public string? BranchName { get; set; }
 
+        public string? CustomerNotes { get; set; }
+        public Guid? UserId { get; set; }
+        public string? ManagedByName { get; set; }
+        public Guid? CustomerAssignedBy { get; set; }
+        public string? CustomerAssignedByName { get; set; }
+        public DateTime? CustomerAssignedDate { get; set; }
+        public bool? IsEscalationRequested { get; set; }
+        public Guid? EscalationRequestedBy { get; set; }
+        public string? EscalationRequestedByName { get; set; }
+        public string? EscalationRequestedOn { get; set; }
+        public Guid? EscalatedBy { get; set; }
+        public string? EscalatedByUserName { get; set; }
+        public string? EscalatedOn { get; set; }
+
         public static CustomerDto FromEntity(Customer customer)
         {
             return new CustomerDto
@@ -52,7 +66,20 @@ namespace CrmBackend.Application.DTOs.CustomersDTOs
                 IsVisitedShowroom = customer.IsVisitedShowroom,
                 CustomerTimeSpent = customer.CustomerTimeSpent,
                 BranchId = customer.BranchId,
-                BranchName = customer.Branch?.Name
+                BranchName = customer.Branch?.Name,
+                CustomerNotes = customer.CustomerNotes,
+                UserId = customer.UserId,
+                ManagedByName = customer.User?.FullName,
+                CustomerAssignedBy = customer.CustomerAssignedBy,
+                CustomerAssignedByName = customer.CustomerAssignedByUser?.FullName,
+                CustomerAssignedDate = customer.CustomerAssignedDate,
+                IsEscalationRequested = customer.IsEscalationRequested,
+                EscalationRequestedBy = customer.EscalationRequestedBy,
+                EscalationRequestedByName = customer.EscalationRequestedByUser?.FullName,
+                EscalationRequestedOn = customer.EscalationRequestedOn,
+                EscalatedBy = customer.EscalatedBy,
+                EscalatedByUserName = customer.EscalatedByUser?.FullName,
+                EscalatedOn = customer.EscalatedOn
             };
         }
     }

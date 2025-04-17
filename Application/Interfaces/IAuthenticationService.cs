@@ -4,5 +4,6 @@ namespace CrmBackend.Application.Interfaces;
 
 public interface IAuthenticationService
 {
-    string GenerateToken(User user);
+    string GenerateToken(User user, List<string> permissions);
 }
+
