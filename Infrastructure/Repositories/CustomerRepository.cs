@@ -3,6 +3,7 @@ using CrmBackend.Domain.Entities;
 using CrmBackend.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using CrmBackend.Domain.Enums;
+using CrmBackend.Application.DTOs.CustomersDTOs;
 
 namespace CrmBackend.Infrastructure.Repositories;
 
@@ -94,6 +95,45 @@ public class CustomerRepository : ICustomerRepository
             .Where(c => c.CustomerNextMeetingDate != null && !c.IsDeleted)
             .ToListAsync();
     }
+
+    // CustomerRepository.cs
+    public async Task<Customer?> FindByPhoneAsync(string phone)
+    {
+        return await _context.Customers
+            .Include(c => c.Branch)
+            .Include(c => c.CustomerAssignedToUser)
+            .FirstOrDefaultAsync(c => c.CustomerContact == phone);
+    }
+
+    public async Task<List<CustomerCountByUserDto>> GetCountGroupedByCreatedByAsync(int branchId)
+    {
+        return await _context.Customers
+            .Where(c => c.BranchId == branchId && c.UserId != null)
+            .GroupBy(c => new { c.UserId, c.User.FullName })
+            .Select(g => new CustomerCountByUserDto
+            {
+                UserId = g.Key.UserId ?? Guid.Empty,
+                UserName = g.Key.FullName,
+                Count = g.Count()
+            })
+            .ToListAsync();
+    }
+
+    public async Task<List<CustomerCountByUserDto>> GetCountGroupedByAssignedToAsync(int branchId)
+    {
+        return await _context.Customers
+            .Where(c => c.BranchId == branchId && c.CustomerAssignedTo != null)
+            .GroupBy(c => new { c.CustomerAssignedTo, c.CustomerAssignedToUser.FullName })
+            .Select(g => new CustomerCountByUserDto
+            {
+                UserId = g.Key.CustomerAssignedTo ?? Guid.Empty,
+                UserName = g.Key.FullName,
+                Count = g.Count()
+            })
+            .ToListAsync();
+    }
+
+
 
 
 }

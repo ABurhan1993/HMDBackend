@@ -1,4 +1,5 @@
-﻿using CrmBackend.Domain.Entities;
+﻿using CrmBackend.Application.DTOs.CustomersDTOs;
+using CrmBackend.Domain.Entities;
 using CrmBackend.Domain.Enums;
 
 namespace CrmBackend.Domain.Services;
@@ -16,5 +17,9 @@ public interface ICustomerRepository
     IQueryable<Customer> Query();
     Task SoftDeleteAsync(int customerId, Guid deletedBy);
     Task<IEnumerable<Customer>> GetUpcomingMeetingsAsync();
+    Task<Customer?> FindByPhoneAsync(string phone);
+    Task<List<CustomerCountByUserDto>> GetCountGroupedByCreatedByAsync(int branchId);
+    Task<List<CustomerCountByUserDto>> GetCountGroupedByAssignedToAsync(int branchId);
+
 
 }

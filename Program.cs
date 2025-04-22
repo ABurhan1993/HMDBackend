@@ -19,6 +19,7 @@ using CrmBackend.Application.Handlers.BranchHandlers;
 using CrmBackend.Application.Handlers.RoleHandlers;
 using CrmBackend.Application.CustomerHandlers;
 using CrmBackend.Infrastructure.Services;
+using CrmBackend.Application.Handlers.InquiryHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +32,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173", "https://mhdcrm.onrender.com")
+        policy.WithOrigins("http://localhost:3000", "http://localhost:5173", "https://mhdcrm.onrender.com" , "https://www.hmdserver.com/")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials();
@@ -75,11 +76,14 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerCommentRepository, CustomerCommentRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IBranchRepository, BranchRepository>();
+builder.Services.AddScoped<IInquiryRepository, InquiryRepository>();
+
 
 // Services
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<PermissionHelper>();
+builder.Services.AddHttpContextAccessor();
 
 
 // Handlers
@@ -98,6 +102,11 @@ builder.Services.AddScoped<GetCustomersByContactStatusHandler>();
 builder.Services.AddScoped<GetCustomersByWayOfContactHandler>();
 builder.Services.AddScoped<GetCustomersByAssignedToIdHandler>();
 builder.Services.AddScoped<GetCustomersWithUpcomingMeetingsHandler>();
+builder.Services.AddScoped<GetCustomerByPhoneHandler>();
+builder.Services.AddScoped<GetCustomerCountByCreatedByHandler>();
+builder.Services.AddScoped<GetCustomerCountByAssignedToHandler>();
+
+
 
 builder.Services.AddScoped<GetAllUsersHandler>();
 builder.Services.AddScoped<CreateUserCommandHandler>();
@@ -110,6 +119,9 @@ builder.Services.AddScoped<CreateRoleCommandHandler>();
 builder.Services.AddScoped<UpdateRoleCommandHandler>();
 builder.Services.AddScoped<GetAllRolesHandler>();
 builder.Services.AddScoped<GetUsersByBranchIdHandler>();
+builder.Services.AddScoped<AddInquiryCommandHandler>();
+builder.Services.AddScoped<GetInquiriesForDisplayHandler>();
+
 
 // Controllers
 builder.Services.AddControllers();

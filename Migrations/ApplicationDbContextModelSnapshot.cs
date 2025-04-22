@@ -57,6 +57,135 @@ namespace CrmBackend.Migrations
                     b.ToTable("Branches");
                 });
 
+            modelBuilder.Entity("CrmBackend.Domain.Entities.Building", b =>
+                {
+                    b.Property<int>("BuildingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("BuildingId"));
+
+                    b.Property<string>("BuildingAddress")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("BuildingCondition")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("BuildingFloor")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("BuildingLatitude")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("BuildingLongitude")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("BuildingMakaniMap")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool?>("BuildingReconstruction")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("BuildingTypeOfUnit")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsOccupied")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("BuildingId");
+
+                    b.ToTable("Buildings");
+                });
+
+            modelBuilder.Entity("CrmBackend.Domain.Entities.Comment", b =>
+                {
+                    b.Property<int>("CommentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("CommentId"));
+
+                    b.Property<Guid?>("CommentAddedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CommentAddedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CommentDetail")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CommentName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("CommentNextFollowup")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("InquiryId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("InquiryStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("InquiryWorkscopeId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsFollowedUpRequired")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("CommentId");
+
+                    b.HasIndex("CommentAddedBy");
+
+                    b.HasIndex("InquiryId");
+
+                    b.HasIndex("InquiryWorkscopeId");
+
+                    b.ToTable("Comments");
+                });
+
             modelBuilder.Entity("CrmBackend.Domain.Entities.Customer", b =>
                 {
                     b.Property<int>("CustomerId")
@@ -164,6 +293,9 @@ namespace CrmBackend.Migrations
 
                     b.HasIndex("CustomerAssignedTo");
 
+                    b.HasIndex("CustomerContact")
+                        .IsUnique();
+
                     b.HasIndex("EscalatedBy");
 
                     b.HasIndex("EscalationRequestedBy");
@@ -260,6 +392,211 @@ namespace CrmBackend.Migrations
                     b.HasIndex("CustomerId");
 
                     b.ToTable("CustomerComments");
+                });
+
+            modelBuilder.Entity("CrmBackend.Domain.Entities.Inquiry", b =>
+                {
+                    b.Property<int>("InquiryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("InquiryId"));
+
+                    b.Property<int?>("BranchId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("BuildingId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("CustomerId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("EscalationRequestedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("EscalationRequestedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("ExistingInquiryId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("InquiryCode")
+                        .HasColumnType("text");
+
+                    b.Property<string>("InquiryDescription")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("InquiryDueDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("InquiryEndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("InquiryName")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("InquiryStartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsDesignProvidedByCustomer")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsEscalationRequested")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsExistingInquiry")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsInquiryLocked")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsMeasurementProvidedByCustomer")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsQuotationReschedule")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid?>("ManagedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("QuotationAddedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("QuotationAssignTo")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("QuotationScheduleDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("TempContractAssignedTo")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("InquiryId");
+
+                    b.HasIndex("BranchId");
+
+                    b.HasIndex("BuildingId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("EscalationRequestedBy");
+
+                    b.HasIndex("ExistingInquiryId");
+
+                    b.HasIndex("ManagedBy");
+
+                    b.HasIndex("QuotationAssignTo");
+
+                    b.ToTable("Inquiries");
+                });
+
+            modelBuilder.Entity("CrmBackend.Domain.Entities.InquiryWorkscope", b =>
+                {
+                    b.Property<int>("InquiryWorkscopeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("InquiryWorkscopeId"));
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("DesignAddedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("DesignAssignedTo")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("DesignScheduleDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("FeedbackReaction")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("InquiryId")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("InquiryStatus")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("InquiryWorkscopeDetailName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsDesignApproved")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsDesignReschedule")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsDesignSentToCustomer")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsMeasurementDrawing")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsMeasurementReschedule")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("MeasurementAddedOn")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("MeasurementAssignedTo")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("MeasurementScheduleDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("WorkScopeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("InquiryWorkscopeId");
+
+                    b.HasIndex("DesignAssignedTo");
+
+                    b.HasIndex("InquiryId");
+
+                    b.HasIndex("MeasurementAssignedTo");
+
+                    b.HasIndex("WorkScopeId");
+
+                    b.ToTable("InquiryWorkscopes");
                 });
 
             modelBuilder.Entity("CrmBackend.Domain.Entities.Role", b =>
@@ -455,6 +792,159 @@ namespace CrmBackend.Migrations
                     b.ToTable("UserClaims", (string)null);
                 });
 
+            modelBuilder.Entity("CrmBackend.Domain.Entities.WorkscopeQuotationDetail", b =>
+                {
+                    b.Property<int>("WorkscopeQuotationDetailId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WorkscopeQuotationDetailId"));
+
+                    b.Property<string>("AccessoriesAmount")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Amount")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("AppliancesAmount")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("CounterTopAmount")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("InquiryWorkscopeId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool?>("IsUrlGenerated")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("LightningAmount")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("QuotationAddedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("QuotationAddedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("QuotationUpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("QuotationUpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SpecialItemAmount")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TotalAmount")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("UrlGeneratedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("WoodenWorkAmount")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("WorkscopeQuotationPic")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("WorkscopeQuotationDetailId");
+
+                    b.HasIndex("InquiryWorkscopeId")
+                        .IsUnique();
+
+                    b.ToTable("WorkscopeQuotationDetails");
+                });
+
+            modelBuilder.Entity("WorkScope", b =>
+                {
+                    b.Property<int>("WorkScopeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("WorkScopeId"));
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int?>("QuestionaireType")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("WorkScopeDescription")
+                        .HasColumnType("text");
+
+                    b.Property<string>("WorkScopeName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("WorkScopeId");
+
+                    b.ToTable("WorkScopes");
+                });
+
+            modelBuilder.Entity("CrmBackend.Domain.Entities.Comment", b =>
+                {
+                    b.HasOne("CrmBackend.Domain.Entities.User", "CommentAddedByUser")
+                        .WithMany()
+                        .HasForeignKey("CommentAddedBy");
+
+                    b.HasOne("CrmBackend.Domain.Entities.Inquiry", "Inquiry")
+                        .WithMany()
+                        .HasForeignKey("InquiryId");
+
+                    b.HasOne("CrmBackend.Domain.Entities.InquiryWorkscope", "InquiryWorkscope")
+                        .WithMany("Comments")
+                        .HasForeignKey("InquiryWorkscopeId");
+
+                    b.Navigation("CommentAddedByUser");
+
+                    b.Navigation("Inquiry");
+
+                    b.Navigation("InquiryWorkscope");
+                });
+
             modelBuilder.Entity("CrmBackend.Domain.Entities.Customer", b =>
                 {
                     b.HasOne("CrmBackend.Domain.Entities.Branch", "Branch")
@@ -532,6 +1022,82 @@ namespace CrmBackend.Migrations
                     b.Navigation("Customer");
                 });
 
+            modelBuilder.Entity("CrmBackend.Domain.Entities.Inquiry", b =>
+                {
+                    b.HasOne("CrmBackend.Domain.Entities.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId");
+
+                    b.HasOne("CrmBackend.Domain.Entities.Building", "Building")
+                        .WithMany("Inquiries")
+                        .HasForeignKey("BuildingId");
+
+                    b.HasOne("CrmBackend.Domain.Entities.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId");
+
+                    b.HasOne("CrmBackend.Domain.Entities.User", "EscalationRequestedByUser")
+                        .WithMany()
+                        .HasForeignKey("EscalationRequestedBy");
+
+                    b.HasOne("CrmBackend.Domain.Entities.Inquiry", "ExistingInquiry")
+                        .WithMany()
+                        .HasForeignKey("ExistingInquiryId");
+
+                    b.HasOne("CrmBackend.Domain.Entities.User", "ManagedByUser")
+                        .WithMany()
+                        .HasForeignKey("ManagedBy");
+
+                    b.HasOne("CrmBackend.Domain.Entities.User", "QuotationAssignedUser")
+                        .WithMany()
+                        .HasForeignKey("QuotationAssignTo");
+
+                    b.Navigation("Branch");
+
+                    b.Navigation("Building");
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("EscalationRequestedByUser");
+
+                    b.Navigation("ExistingInquiry");
+
+                    b.Navigation("ManagedByUser");
+
+                    b.Navigation("QuotationAssignedUser");
+                });
+
+            modelBuilder.Entity("CrmBackend.Domain.Entities.InquiryWorkscope", b =>
+                {
+                    b.HasOne("CrmBackend.Domain.Entities.User", "DesignAssignedUser")
+                        .WithMany()
+                        .HasForeignKey("DesignAssignedTo");
+
+                    b.HasOne("CrmBackend.Domain.Entities.Inquiry", "Inquiry")
+                        .WithMany("InquiryWorkscopes")
+                        .HasForeignKey("InquiryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CrmBackend.Domain.Entities.User", "MeasurementAssignedUser")
+                        .WithMany()
+                        .HasForeignKey("MeasurementAssignedTo");
+
+                    b.HasOne("WorkScope", "WorkScope")
+                        .WithMany("InquiryWorkscopes")
+                        .HasForeignKey("WorkScopeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DesignAssignedUser");
+
+                    b.Navigation("Inquiry");
+
+                    b.Navigation("MeasurementAssignedUser");
+
+                    b.Navigation("WorkScope");
+                });
+
             modelBuilder.Entity("CrmBackend.Domain.Entities.RoleClaim", b =>
                 {
                     b.HasOne("CrmBackend.Domain.Entities.Role", "Role")
@@ -573,6 +1139,17 @@ namespace CrmBackend.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("CrmBackend.Domain.Entities.WorkscopeQuotationDetail", b =>
+                {
+                    b.HasOne("CrmBackend.Domain.Entities.InquiryWorkscope", "InquiryWorkscope")
+                        .WithOne("QuotationDetail")
+                        .HasForeignKey("CrmBackend.Domain.Entities.WorkscopeQuotationDetail", "InquiryWorkscopeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("InquiryWorkscope");
+                });
+
             modelBuilder.Entity("CrmBackend.Domain.Entities.Branch", b =>
                 {
                     b.Navigation("Customers");
@@ -580,11 +1157,29 @@ namespace CrmBackend.Migrations
                     b.Navigation("Users");
                 });
 
+            modelBuilder.Entity("CrmBackend.Domain.Entities.Building", b =>
+                {
+                    b.Navigation("Inquiries");
+                });
+
             modelBuilder.Entity("CrmBackend.Domain.Entities.Customer", b =>
                 {
                     b.Navigation("CustomerBranches");
 
                     b.Navigation("CustomerComments");
+                });
+
+            modelBuilder.Entity("CrmBackend.Domain.Entities.Inquiry", b =>
+                {
+                    b.Navigation("InquiryWorkscopes");
+                });
+
+            modelBuilder.Entity("CrmBackend.Domain.Entities.InquiryWorkscope", b =>
+                {
+                    b.Navigation("Comments");
+
+                    b.Navigation("QuotationDetail")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("CrmBackend.Domain.Entities.Role", b =>
@@ -597,6 +1192,11 @@ namespace CrmBackend.Migrations
             modelBuilder.Entity("CrmBackend.Domain.Entities.User", b =>
                 {
                     b.Navigation("Claims");
+                });
+
+            modelBuilder.Entity("WorkScope", b =>
+                {
+                    b.Navigation("InquiryWorkscopes");
                 });
 #pragma warning restore 612, 618
         }

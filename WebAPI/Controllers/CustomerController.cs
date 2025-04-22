@@ -28,6 +28,7 @@ public class CustomerController : ControllerBase
     private readonly GetCustomersByAssignedToIdHandler _getByAssignHandler;
     private readonly DeleteCustomerHandler _deleteCustomerHandler;
     private readonly ICustomerCommentRepository _customerCommentRepository;
+    private readonly GetCustomerByPhoneHandler _getCustomerByPhoneHandler;
     public CustomerController(
         CreateCustomerCommandHandler createHandler,
         UpdateCustomerAssignmentHandler updateAssignHandler,
@@ -39,7 +40,8 @@ public class CustomerController : ControllerBase
         GetCustomersByWayOfContactHandler getByWayHandler,
         GetCustomersByAssignedToIdHandler getByAssignHandler,
         DeleteCustomerHandler deleteCustomerHandler,
-        ICustomerCommentRepository customerCommentRepository)
+        ICustomerCommentRepository customerCommentRepository,
+        GetCustomerByPhoneHandler getCustomerByPhoneHandler)
     {
         _createHandler = createHandler;
         _updateAssignHandler = updateAssignHandler;
@@ -52,6 +54,7 @@ public class CustomerController : ControllerBase
         _getByAssignHandler = getByAssignHandler;
         _deleteCustomerHandler = deleteCustomerHandler;
         _customerCommentRepository = customerCommentRepository;
+        _getCustomerByPhoneHandler = getCustomerByPhoneHandler;
     }
 
     [Authorize(Policy = PermissionConstants.Customers.Create)]
@@ -185,6 +188,51 @@ public class CustomerController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpGet("by-phone")]
+    public async Task<IActionResult> GetCustomerByPhone([FromQuery] string phone)
+    {
+        var customer = await _getCustomerByPhoneHandler.Handle(new GetCustomerByPhoneCommand { Phone = phone });
+        if (customer == null)
+            return NotFound();
+
+        return Ok(new
+        {
+            customer.CustomerId,
+            customer.CustomerName,
+            customer.CustomerEmail,
+            customer.CustomerWhatsapp,
+            customer.CustomerAddress,
+            customer.CustomerCity,
+            customer.CustomerCountry,
+            customer.CustomerNationality,
+            customer.CustomerNotes,
+            customer.CustomerNextMeetingDate,
+            customerAssignedTo = customer.CustomerAssignedToUser?.Id,
+            customerAssignedToName = customer.CustomerAssignedToUser?.FullName,
+            customer.WayOfContact,
+            customer.ContactStatus
+        });
+    }
+
+    [HttpGet("created-by")]
+    public async Task<IActionResult> GetCountByCreatedBy(
+    [FromServices] GetCustomerCountByCreatedByHandler handler)
+    {
+        var branchId = int.Parse(User.FindFirst("BranchId")!.Value);
+        var result = await handler.HandleAsync(branchId);
+        return Ok(result);
+    }
+
+    [HttpGet("assigned-to")]
+    public async Task<IActionResult> GetCountByAssignedTo(
+        [FromServices] GetCustomerCountByAssignedToHandler handler)
+    {
+        var branchId = int.Parse(User.FindFirst("BranchId")!.Value);
+        var result = await handler.HandleAsync(branchId);
+        return Ok(result);
+    }
+
 
 
 }

@@ -2,6 +2,7 @@
 using CrmBackend.Domain.Entities;
 using CrmBackend.Domain.Enums;
 using CrmBackend.Domain.Services;
+using MediatR;
 
 namespace CrmBackend.Application.Handlers.CustomerHandlers;
 
@@ -21,6 +22,9 @@ public class CreateCustomerCommandHandler
         var user = await _userRepository.GetByIdAsync(command.CreatedBy);
         if (user == null)
             throw new Exception("Invalid user");
+
+        if (!PhoneValidator.IsValidUAEPhone(command.CustomerContact))
+            throw new Exception("Phone number must start with '971' and be 12 digits.");
 
         var customer = new Customer
         {

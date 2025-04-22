@@ -2,6 +2,7 @@
 using CrmBackend.Domain.Entities;
 using CrmBackend.Domain.Enums;
 using CrmBackend.Domain.Services;
+using MediatR;
 
 namespace CrmBackend.Application.Handlers.CustomerHandlers;
 
@@ -25,6 +26,8 @@ public class UpdateCustomerHandler
         var user = await _userRepository.GetByIdAsync(command.UpdatedBy);
         if (user == null)
             throw new Exception("User not found");
+        if (!PhoneValidator.IsValidUAEPhone(command.CustomerContact))
+            throw new Exception("Phone number must start with '971' and be 12 digits.");
 
         customer.CustomerName = command.CustomerName;
         customer.CustomerEmail = command.CustomerEmail;

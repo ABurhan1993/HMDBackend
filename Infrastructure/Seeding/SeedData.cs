@@ -87,6 +87,20 @@ public static class SeedData
             });
         }
 
-        await context.SaveChangesAsync();
+        // ✅ Seed Workscopes if not exist
+        if (!await context.WorkScopes.AnyAsync())
+        {
+            context.WorkScopes.AddRange(new[]
+            {
+        new WorkScope { WorkScopeName = "Kitchen Cabinets", WorkScopeDescription = "Workscope for kitchen modules" },
+        new WorkScope { WorkScopeName = "Wardrobes", WorkScopeDescription = "Workscope for wardrobes" },
+        new WorkScope { WorkScopeName = "TV Unit", WorkScopeDescription = "TV wall units and shelves" },
+        new WorkScope { WorkScopeName = "Vanity", WorkScopeDescription = "Bathroom cabinetry" },
+        new WorkScope { WorkScopeName = "Other", WorkScopeDescription = "Miscellaneous work" }
+    });
+        }
+
+
+        await context.SaveChangesAsync(); // Save everything
     }
 }

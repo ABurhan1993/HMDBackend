@@ -44,6 +44,7 @@ namespace CrmBackend.Application.DTOs.CustomersDTOs
         public Guid? EscalatedBy { get; set; }
         public string? EscalatedByUserName { get; set; }
         public string? EscalatedOn { get; set; }
+        public DateTime? CreatedDate {  get; set; }
 
         public static CustomerDto FromEntity(Customer customer)
         {
@@ -79,7 +80,8 @@ namespace CrmBackend.Application.DTOs.CustomersDTOs
                 EscalationRequestedOn = customer.EscalationRequestedOn,
                 EscalatedBy = customer.EscalatedBy,
                 EscalatedByUserName = customer.EscalatedByUser?.FullName,
-                EscalatedOn = customer.EscalatedOn
+                EscalatedOn = customer.EscalatedOn,
+                CreatedDate = customer.CreatedDate
             };
         }
     }
