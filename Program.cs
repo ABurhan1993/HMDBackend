@@ -32,10 +32,17 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173", "https://mhdcrm.onrender.com" , "https://www.hmdserver.com/")
-              .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+        policy.WithOrigins(
+            "http://localhost:3000", 
+            "http://localhost:5173",
+            "https://mhdcrm.onrender.com",
+            "https://www.hmdserver.com",
+            "https://hmdserver.com" // <-- هذا مهم تضيفه
+            )
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
+
     });
 });
 
