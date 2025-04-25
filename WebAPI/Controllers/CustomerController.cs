@@ -181,13 +181,14 @@ public class CustomerController : ControllerBase
             .Select(c => new CustomerCommentDto
             {
                 Comment = c.CustomerCommentDetail,
-                CreatedDate = (DateTime)c.CreatedDate,
-                AddedBy = c.CommentAddedByNavigation.FullName,
+                CreatedDate = c.CreatedDate ?? DateTime.MinValue, // ✅ إصلاح الخطأ
+                AddedBy = c.CommentAddedByNavigation?.FullName ?? "Unknown"
             })
             .ToList();
 
         return Ok(result);
     }
+
 
     [HttpGet("by-phone")]
     public async Task<IActionResult> GetCustomerByPhone([FromQuery] string phone)

@@ -12,7 +12,6 @@ public class UpdateCustomerCommand
     public string? CustomerCountry { get; set; }
     public string? CustomerNationality { get; set; }
     public string? CustomerNationalId { get; set; }
-    public string? CustomerNotes { get; set; }
     public DateTime? CustomerNextMeetingDate { get; set; }
     public int? ContactStatus { get; set; }
     public bool? IsVisitedShowroom { get; set; }
@@ -20,4 +19,5 @@ public class UpdateCustomerCommand
     public int? WayOfContact { get; set; }
     public Guid? CustomerAssignedTo { get; set; }
     public Guid UpdatedBy { get; set; } // من التوكن لاحقًا
+    public string? CommentDetail { get; set; } // التعليق الجديد
 }

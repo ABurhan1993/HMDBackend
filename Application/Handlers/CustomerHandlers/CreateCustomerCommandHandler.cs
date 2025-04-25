@@ -10,11 +10,16 @@ public class CreateCustomerCommandHandler
 {
     private readonly ICustomerRepository _customerRepository;
     private readonly IUserRepository _userRepository;
+    private readonly ICustomerCommentRepository _customerCommentRepository;
 
-    public CreateCustomerCommandHandler(ICustomerRepository customerRepository, IUserRepository userRepository)
+    public CreateCustomerCommandHandler(
+        ICustomerRepository customerRepository,
+        IUserRepository userRepository,
+        ICustomerCommentRepository customerCommentRepository)
     {
         _customerRepository = customerRepository;
         _userRepository = userRepository;
+        _customerCommentRepository = customerCommentRepository;
     }
 
     public async Task<int> Handle(CreateCustomerCommand command)
@@ -23,8 +28,6 @@ public class CreateCustomerCommandHandler
         if (user == null)
             throw new Exception("Invalid user");
 
-        if (!PhoneValidator.IsValidUAEPhone(command.CustomerContact))
-            throw new Exception("Phone number must start with '971' and be 12 digits.");
 
         var customer = new Customer
         {
@@ -36,9 +39,9 @@ public class CreateCustomerCommandHandler
             CustomerCity = command.CustomerCity,
             CustomerCountry = command.CustomerCountry,
             CustomerNationality = command.CustomerNationality,
-            CustomerNotes = command.CustomerNotes,
             CustomerNextMeetingDate = command.CustomerNextMeetingDate.HasValue
-            ? DateTime.SpecifyKind(command.CustomerNextMeetingDate.Value, DateTimeKind.Utc): null,
+                ? DateTime.SpecifyKind(command.CustomerNextMeetingDate.Value, DateTimeKind.Utc)
+                : null,
             ContactStatus = (ContactStatus)command.ContactStatus,
             IsVisitedShowroom = command.IsVisitedShowroom,
             CustomerTimeSpent = command.CustomerTimeSpent,
@@ -51,12 +54,26 @@ public class CreateCustomerCommandHandler
             CreatedBy = command.CreatedBy,
             CreatedDate = DateTime.UtcNow,
             IsActive = true,
-            IsDeleted = false,
-            
-
+            IsDeleted = false
         };
 
         await _customerRepository.AddAsync(customer);
+
+        if (!string.IsNullOrWhiteSpace(command.InitialComment))
+        {
+            var comment = new CustomerComment
+            {
+                CustomerId = customer.CustomerId,
+                CustomerCommentDetail = command.InitialComment,
+                CommentAddedBy = command.CreatedBy,
+                CommentAddedOn = DateTime.UtcNow,
+                CreatedDate = DateTime.UtcNow,
+                CreatedBy = command.CreatedBy
+            };
+
+            await _customerCommentRepository.AddAsync(comment);
+        }
+
         return customer.CustomerId;
     }
 }
