@@ -2,6 +2,7 @@
 using CrmBackend.Application.Handlers.BranchHandlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using CrmBackend.Domain.Constants; // ✅ لازم استيراد الكونستانت تبع البرميشن
 
 [Authorize]
 [ApiController]
@@ -22,6 +23,7 @@ public class BranchController : ControllerBase
         _getAllHandler = getAllHandler;
     }
 
+    [Authorize(Policy = PermissionConstants.Branches.Create)] // 🔥 صلاحية إنشاء فرع
     [HttpPost("create")]
     public async Task<IActionResult> Create([FromBody] CreateBranchCommand command)
     {
@@ -29,6 +31,7 @@ public class BranchController : ControllerBase
         return Ok(new { BranchId = id });
     }
 
+    [Authorize(Policy = PermissionConstants.Branches.Edit)] // 🔥 صلاحية تعديل فرع
     [HttpPut("update")]
     public async Task<IActionResult> Update([FromBody] UpdateBranchCommand command)
     {
@@ -36,6 +39,7 @@ public class BranchController : ControllerBase
         return Ok();
     }
 
+    [Authorize(Policy = PermissionConstants.Branches.View)] // 🔥 صلاحية عرض الفروع
     [HttpGet("all")]
     public async Task<IActionResult> GetAll()
     {

@@ -25,12 +25,13 @@ public class PermissionHelper
             return new List<string>();
 
         var rolePermissions = user.Role?.RoleClaims
-            .Where(rc => rc.Type == "Permission")
-            .Select(rc => rc.Value) ?? Enumerable.Empty<string>();
+    .Where(rc => rc.Type.Equals("Permission", StringComparison.OrdinalIgnoreCase))
+    .Select(rc => rc.Value) ?? Enumerable.Empty<string>();
 
         var userPermissions = user.Claims
-            .Where(uc => uc.ClaimType == "Permission")
+            .Where(uc => uc.ClaimType.Equals("Permission", StringComparison.OrdinalIgnoreCase))
             .Select(uc => uc.ClaimValue);
+
 
         return rolePermissions
             .Concat(userPermissions)

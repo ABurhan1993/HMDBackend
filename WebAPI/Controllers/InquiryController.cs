@@ -3,28 +3,28 @@ using CrmBackend.Application.DTOs.InquiryDtos;
 using CrmBackend.Application.Handlers.InquiryHandlers;
 using CrmBackend.Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace CrmBackend.WebAPI.Controllers;
 
 [Authorize]
-[Route("api/[controller]")]
 [ApiController]
+[Route("api/[controller]")]
 public class InquiryController : ControllerBase
 {
     private readonly AddInquiryCommandHandler _addInquiryHandler;
     private readonly GetInquiriesForDisplayHandler _getInquiriesHandler;
 
-    public InquiryController(AddInquiryCommandHandler addInquiryHandler,
+    public InquiryController(
+        AddInquiryCommandHandler addInquiryHandler,
         GetInquiriesForDisplayHandler getInquiriesHandler)
     {
         _addInquiryHandler = addInquiryHandler;
         _getInquiriesHandler = getInquiriesHandler;
     }
 
-    [Authorize(Policy = PermissionConstants.Inquiries.Create)]
+    [Authorize(Policy = PermissionConstants.Inquiries.Create)] // 🔥 صلاحية إنشاء استفسار
     [HttpPost("create")]
     public async Task<IActionResult> AddInquiry([FromBody] CreateInquiryRequest request)
     {
@@ -36,7 +36,7 @@ public class InquiryController : ControllerBase
         return Ok(new { inquiryId });
     }
 
-    [Authorize(Policy = PermissionConstants.Inquiries.View)]
+    [Authorize(Policy = PermissionConstants.Inquiries.View)] // 🔥 صلاحية عرض الاستفسارات
     [HttpGet("all")]
     public async Task<IActionResult> GetAll()
     {
@@ -44,6 +44,4 @@ public class InquiryController : ControllerBase
         var result = await _getInquiriesHandler.Handle(branchId);
         return Ok(result);
     }
-
-
 }

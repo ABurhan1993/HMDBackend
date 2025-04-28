@@ -1,7 +1,7 @@
-﻿namespace CrmBackend.Application.Commands.RoleCommands
+﻿namespace CrmBackend.Application.Commands.RoleCommands;
+
+public class CreateRoleCommand
 {
-    public class CreateRoleCommand
-    {
-        public string Name { get; set; }
-    }
+    public string RoleName { get; set; } = string.Empty;
+    public List<string> Claims { get; set; } = new();
 }

@@ -6,17 +6,39 @@ namespace CrmBackend.Application.Handlers.RoleHandlers
 {
     public class CreateRoleCommandHandler
     {
-        private readonly IRoleRepository _repository;
+        private readonly IRoleRepository _roleRepository;
+        private readonly IRoleClaimRepository _roleClaimRepository;
 
-        public CreateRoleCommandHandler(IRoleRepository repository)
+        public CreateRoleCommandHandler(
+            IRoleRepository roleRepository,
+            IRoleClaimRepository roleClaimRepository)
         {
-            _repository = repository;
+            _roleRepository = roleRepository;
+            _roleClaimRepository = roleClaimRepository;
         }
 
         public async Task<Guid> Handle(CreateRoleCommand command)
         {
-            var role = new Role { Name = command.Name };
-            return await _repository.AddAsync(role);
+            var newRole = new Role
+            {
+                Name = command.RoleName
+            };
+
+            await _roleRepository.AddAsync(newRole);
+
+            foreach (var claim in command.Claims)
+            {
+                var roleClaim = new RoleClaim
+                {
+                    RoleId = newRole.Id,
+                    Type = "permission",
+                    Value = claim
+                };
+
+                await _roleClaimRepository.AddAsync(roleClaim);
+            }
+
+            return newRole.Id;
         }
     }
 }

@@ -34,6 +34,9 @@ public class RoleRepository : IRoleRepository
 
     public async Task<List<Role>> GetAllAsync()
     {
-        return await _context.Roles.ToListAsync();
+        return await _context.Roles
+            .Include(r => r.RoleClaims) // 🔥 هي المهمة
+            .ToListAsync();
     }
 }
+

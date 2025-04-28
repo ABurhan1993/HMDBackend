@@ -34,13 +34,19 @@ public class AuthenticationService : IAuthenticationService
         new Claim("BranchId", user.BranchId.ToString())
     };
 
-        // ✅ أضف كل الصلاحيات كـ Claims
-        claims.AddRange(permissions.Select(p => new Claim("Permission", p)));
+        // ✅ إضافة الصلاحيات بشكل صحيح
+        if (permissions != null && permissions.Any())
+        {
+            foreach (var permission in permissions)
+            {
+                claims.Add(new Claim("Permission", permission));
+            }
+        }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var token = new JwtSecurityToken(
+        var tokenDescriptor = new JwtSecurityToken(
             issuer: _configuration["Jwt:Issuer"],
             audience: _configuration["Jwt:Audience"],
             claims: claims,
@@ -48,7 +54,8 @@ public class AuthenticationService : IAuthenticationService
             signingCredentials: creds
         );
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
     }
+
 }
 

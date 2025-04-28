@@ -1,9 +1,12 @@
 ﻿using CrmBackend.Infrastructure.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using CrmBackend.Domain.Constants;
 
 namespace CrmBackend.Web.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class WorkscopeController : ControllerBase
@@ -15,7 +18,7 @@ namespace CrmBackend.Web.Controllers
             _context = context;
         }
 
-        // ✅ GET: api/workscope/all
+        [Authorize(Policy = PermissionConstants.Inquiries.View)] // 🔥 صلاحية مشاهدة الأعمال المرتبطة بالاستفسارات
         [HttpGet("all")]
         public async Task<IActionResult> GetAll()
         {

@@ -29,6 +29,7 @@ public class CustomerController : ControllerBase
     private readonly DeleteCustomerHandler _deleteCustomerHandler;
     private readonly ICustomerCommentRepository _customerCommentRepository;
     private readonly GetCustomerByPhoneHandler _getCustomerByPhoneHandler;
+
     public CustomerController(
         CreateCustomerCommandHandler createHandler,
         UpdateCustomerAssignmentHandler updateAssignHandler,
@@ -73,13 +74,10 @@ public class CustomerController : ControllerBase
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         if (string.IsNullOrEmpty(userId)) return Unauthorized();
-
         command.UpdatedBy = Guid.Parse(userId);
-
         await _updateCustomerHandler.Handle(command);
         return Ok();
     }
-
 
     [Authorize(Policy = PermissionConstants.Customers.Edit)]
     [HttpPut("assign")]
@@ -125,7 +123,6 @@ public class CustomerController : ControllerBase
         return Ok(result);
     }
 
-
     [Authorize(Policy = PermissionConstants.Customers.View)]
     [HttpGet("by-way/{way}")]
     public async Task<IActionResult> GetByWayOfContact(int way)
@@ -134,7 +131,6 @@ public class CustomerController : ControllerBase
         var result = await _getByWayHandler.Handle((WayOfContact)way, branchId);
         return Ok(result);
     }
-
 
     [Authorize(Policy = PermissionConstants.Customers.View)]
     [HttpGet("by-assigned/{assignedToId}")]
@@ -145,12 +141,11 @@ public class CustomerController : ControllerBase
         return Ok(result);
     }
 
-
-    [HttpDelete("{id}")]
     [Authorize(Policy = PermissionConstants.Customers.Delete)]
-    public async Task<IActionResult> Delete([FromQuery]int id)
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete([FromQuery] int id)
     {
-        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);// استخرج من التوكن
+        var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
         var command = new DeleteCustomerCommand
         {
             CustomerId = id,
@@ -161,8 +156,8 @@ public class CustomerController : ControllerBase
         return Ok();
     }
 
-    [HttpGet("calendar-events")]
     [Authorize(Policy = PermissionConstants.Customers.View)]
+    [HttpGet("calendar-events")]
     public async Task<IActionResult> GetCalendarEvents([FromServices] GetCustomersWithUpcomingMeetingsHandler handler)
     {
         var branchId = int.Parse(User.FindFirst("BranchId")!.Value);
@@ -170,7 +165,7 @@ public class CustomerController : ControllerBase
         return Ok(result);
     }
 
-
+    [Authorize(Policy = PermissionConstants.CustomerComments.View)] // 🔥 عرض تعليقات العميل
     [HttpGet("comments/{customerId}")]
     public async Task<IActionResult> GetCustomerComments(int customerId)
     {
@@ -181,7 +176,7 @@ public class CustomerController : ControllerBase
             .Select(c => new CustomerCommentDto
             {
                 Comment = c.CustomerCommentDetail,
-                CreatedDate = c.CreatedDate ?? DateTime.MinValue, // ✅ إصلاح الخطأ
+                CreatedDate = c.CreatedDate ?? DateTime.MinValue,
                 AddedBy = c.CommentAddedByNavigation?.FullName ?? "Unknown"
             })
             .ToList();
@@ -189,7 +184,7 @@ public class CustomerController : ControllerBase
         return Ok(result);
     }
 
-
+    [Authorize(Policy = PermissionConstants.Customers.View)] // 🔥 البحث برقم الهاتف
     [HttpGet("by-phone")]
     public async Task<IActionResult> GetCustomerByPhone([FromQuery] string phone)
     {
@@ -216,24 +211,21 @@ public class CustomerController : ControllerBase
         });
     }
 
+    [Authorize(Policy = PermissionConstants.Customers.View)]
     [HttpGet("created-by")]
-    public async Task<IActionResult> GetCountByCreatedBy(
-    [FromServices] GetCustomerCountByCreatedByHandler handler)
+    public async Task<IActionResult> GetCountByCreatedBy([FromServices] GetCustomerCountByCreatedByHandler handler)
     {
         var branchId = int.Parse(User.FindFirst("BranchId")!.Value);
         var result = await handler.HandleAsync(branchId);
         return Ok(result);
     }
 
+    [Authorize(Policy = PermissionConstants.Customers.View)]
     [HttpGet("assigned-to")]
-    public async Task<IActionResult> GetCountByAssignedTo(
-        [FromServices] GetCustomerCountByAssignedToHandler handler)
+    public async Task<IActionResult> GetCountByAssignedTo([FromServices] GetCustomerCountByAssignedToHandler handler)
     {
         var branchId = int.Parse(User.FindFirst("BranchId")!.Value);
         var result = await handler.HandleAsync(branchId);
         return Ok(result);
     }
-
-
-
 }

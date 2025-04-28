@@ -20,6 +20,7 @@ using CrmBackend.Application.Handlers.RoleHandlers;
 using CrmBackend.Application.CustomerHandlers;
 using CrmBackend.Infrastructure.Services;
 using CrmBackend.Application.Handlers.InquiryHandlers;
+using Microsoft.AspNetCore.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,7 +38,7 @@ builder.Services.AddCors(options =>
             "http://localhost:5173",
             "https://mhdcrm.onrender.com",
             "https://www.hmdserver.com",
-            "https://hmdserver.com" // <-- هذا مهم تضيفه
+            "https://hmdserver.com" 
             )
         .AllowAnyHeader()
         .AllowAnyMethod()
@@ -84,6 +85,8 @@ builder.Services.AddScoped<ICustomerCommentRepository, CustomerCommentRepository
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IBranchRepository, BranchRepository>();
 builder.Services.AddScoped<IInquiryRepository, InquiryRepository>();
+builder.Services.AddScoped<IRoleClaimRepository, RoleClaimRepository>();
+
 
 
 // Services
@@ -117,6 +120,7 @@ builder.Services.AddScoped<GetCustomerCountByAssignedToHandler>();
 
 builder.Services.AddScoped<GetAllUsersHandler>();
 builder.Services.AddScoped<CreateUserCommandHandler>();
+builder.Services.AddScoped<ResetUserPasswordHandler>();
 
 builder.Services.AddScoped<CreateBranchCommandHandler>();
 builder.Services.AddScoped<UpdateBranchCommandHandler>();
@@ -128,6 +132,19 @@ builder.Services.AddScoped<GetAllRolesHandler>();
 builder.Services.AddScoped<GetUsersByBranchIdHandler>();
 builder.Services.AddScoped<AddInquiryCommandHandler>();
 builder.Services.AddScoped<GetInquiriesForDisplayHandler>();
+
+builder.Services.AddSingleton<IAuthorizationHandler, PermissionOrHandler>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("UsersOrCustomersView", policy =>
+        policy.Requirements.Add(new PermissionOrRequirement(
+            "Permissions.Users.View",
+            "Permissions.Customers.View"
+        )));
+
+    // 🔥 فيك تضيف Policies ثانية بنفس الطريقة حسب حاجتك
+});
 
 
 // Controllers

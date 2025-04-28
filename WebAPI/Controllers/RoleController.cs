@@ -2,6 +2,7 @@
 using CrmBackend.Application.Handlers.RoleHandlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using CrmBackend.Domain.Constants;
 
 [Authorize]
 [ApiController]
@@ -22,6 +23,7 @@ public class RoleController : ControllerBase
         _getAllHandler = getAllHandler;
     }
 
+    [Authorize(Policy = PermissionConstants.Roles.Create)] // 🔥 إنشاء دور
     [HttpPost("create")]
     public async Task<IActionResult> Create([FromBody] CreateRoleCommand command)
     {
@@ -29,6 +31,7 @@ public class RoleController : ControllerBase
         return Ok(new { RoleId = id });
     }
 
+    [Authorize(Policy = PermissionConstants.Roles.Edit)] // 🔥 تعديل دور
     [HttpPut("update")]
     public async Task<IActionResult> Update([FromBody] UpdateRoleCommand command)
     {
@@ -36,6 +39,7 @@ public class RoleController : ControllerBase
         return Ok();
     }
 
+    [Authorize(Policy = PermissionConstants.Roles.View)] // 🔥 عرض الأدوار
     [HttpGet("all")]
     public async Task<IActionResult> GetAll()
     {
