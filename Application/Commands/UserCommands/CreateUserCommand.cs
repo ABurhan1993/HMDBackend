@@ -7,6 +7,7 @@ public class CreateUserCommand
     public string Email { get; set; } = null!;
     public string Phone { get; set; }
     public string Password { get; set; } = null!;
+    public bool IsNotificationEnabled { get; set; }
     public Guid RoleId { get; set; }
     public int BranchId { get; set; }
     public Guid CreatedBy { get; set; }

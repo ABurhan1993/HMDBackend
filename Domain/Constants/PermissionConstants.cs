@@ -60,6 +60,15 @@ public static class PermissionConstants
 
         public static readonly string[] All = { View, Create, Edit, Delete };
     }
+    public static class UserClaims
+    {
+        public const string View = "Permissions.UserClaims.View";
+        public const string Create = "Permissions.UserClaims.Create";
+        public const string Delete = "Permissions.UserClaims.Delete";
+
+        public static readonly string[] All = { View, Create, Delete };
+    }
+
     // ✅ جمع كل الصلاحيات العامة
     public static readonly string[] All =
         Customers.All
@@ -68,5 +77,6 @@ public static class PermissionConstants
         .Concat(Roles.All)
         .Concat(CustomerComments.All)
         .Concat (Inquiries.All)
+        .Concat(UserClaims.All)
         .ToArray();
 }

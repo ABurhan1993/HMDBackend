@@ -11,16 +11,17 @@ using CrmBackend.Domain.Constants;
 using CrmBackend.Infrastructure.Seeding;
 using CrmBackend.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using CrmBackend.Infrastructure.Services;
 
 // Handlers
 using CrmBackend.Application.Handlers.CustomerHandlers;
 using CrmBackend.Application.Handlers.UserHandlers;
 using CrmBackend.Application.Handlers.BranchHandlers;
 using CrmBackend.Application.Handlers.RoleHandlers;
-using CrmBackend.Application.CustomerHandlers;
-using CrmBackend.Infrastructure.Services;
 using CrmBackend.Application.Handlers.InquiryHandlers;
-using Microsoft.AspNetCore.Authorization;
+using CrmBackend.Application.CustomerHandlers;
+using CrmBackend.Application.Handlers.UserClaimHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,16 +35,15 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         policy.WithOrigins(
-            "http://localhost:3000", 
+            "http://localhost:3000",
             "http://localhost:5173",
             "https://mhdcrm.onrender.com",
             "https://www.hmdserver.com",
-            "https://hmdserver.com" 
-            )
+            "https://hmdserver.com"
+        )
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials();
-
     });
 });
 
@@ -58,8 +58,15 @@ builder.Services.AddAuthorization(options =>
     var permissions = PermissionConstants.All;
     foreach (var permission in permissions)
     {
-        options.AddPolicy(permission, policy => policy.RequireClaim("Permission", permission));
+        options.AddPolicy(permission, policy =>
+            policy.RequireClaim("Permission", permission));
     }
+
+    options.AddPolicy("UsersOrCustomersView", policy =>
+        policy.Requirements.Add(new PermissionOrRequirement(
+            PermissionConstants.Users.View,
+            PermissionConstants.Customers.View
+        )));
 });
 
 // JWT Authentication
@@ -86,15 +93,13 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IBranchRepository, BranchRepository>();
 builder.Services.AddScoped<IInquiryRepository, InquiryRepository>();
 builder.Services.AddScoped<IRoleClaimRepository, RoleClaimRepository>();
-
-
+builder.Services.AddScoped<IUserClaimRepository, UserClaimRepository>();
 
 // Services
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 builder.Services.AddScoped<PermissionHelper>();
 builder.Services.AddHttpContextAccessor();
-
 
 // Handlers
 builder.Services.AddScoped<LoginCommandHandler>();
@@ -105,7 +110,6 @@ builder.Services.AddScoped<UpdateCustomerHandler>();
 builder.Services.AddScoped<UpdateCustomerAssignmentHandler>();
 builder.Services.AddScoped<AddCustomerCommentHandler>();
 builder.Services.AddScoped<DeleteCustomerHandler>();
-
 builder.Services.AddScoped<GetAllCustomersHandler>();
 builder.Services.AddScoped<GetCustomerByIdHandler>();
 builder.Services.AddScoped<GetCustomersByContactStatusHandler>();
@@ -116,11 +120,11 @@ builder.Services.AddScoped<GetCustomerByPhoneHandler>();
 builder.Services.AddScoped<GetCustomerCountByCreatedByHandler>();
 builder.Services.AddScoped<GetCustomerCountByAssignedToHandler>();
 
-
-
 builder.Services.AddScoped<GetAllUsersHandler>();
 builder.Services.AddScoped<CreateUserCommandHandler>();
 builder.Services.AddScoped<ResetUserPasswordHandler>();
+builder.Services.AddScoped<EditUserCommandHandler>();
+builder.Services.AddScoped<GetUsersByBranchIdHandler>();
 
 builder.Services.AddScoped<CreateBranchCommandHandler>();
 builder.Services.AddScoped<UpdateBranchCommandHandler>();
@@ -129,23 +133,15 @@ builder.Services.AddScoped<GetAllBranchesHandler>();
 builder.Services.AddScoped<CreateRoleCommandHandler>();
 builder.Services.AddScoped<UpdateRoleCommandHandler>();
 builder.Services.AddScoped<GetAllRolesHandler>();
-builder.Services.AddScoped<GetUsersByBranchIdHandler>();
+
 builder.Services.AddScoped<AddInquiryCommandHandler>();
 builder.Services.AddScoped<GetInquiriesForDisplayHandler>();
+// 🔐 User Claims Handlers
+builder.Services.AddScoped<AddUserClaimHandler>();
+builder.Services.AddScoped<DeleteUserClaimHandler>();
+
 
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionOrHandler>();
-
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("UsersOrCustomersView", policy =>
-        policy.Requirements.Add(new PermissionOrRequirement(
-            "Permissions.Users.View",
-            "Permissions.Customers.View"
-        )));
-
-    // 🔥 فيك تضيف Policies ثانية بنفس الطريقة حسب حاجتك
-});
-
 
 // Controllers
 builder.Services.AddControllers();

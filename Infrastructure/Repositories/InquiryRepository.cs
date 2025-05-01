@@ -76,6 +76,7 @@ namespace CrmBackend.Infrastructure.Repositories
                 InquiryStartDate = DateTime.UtcNow,
                 IsDesignProvidedByCustomer = request.IsDesignProvidedByCustomer,
                 IsMeasurementProvidedByCustomer = request.IsMeasurementProvidedByCustomer,
+                Status = InquiryStatus.MeasurementAssigneePending,
                 CustomerId = customerId,
                 BuildingId = buildingId,
                 BranchId = branchId,

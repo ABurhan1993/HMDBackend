@@ -5,6 +5,8 @@ using CrmBackend.Application.UserCommands;
 using CrmBackend.Application.Commands.UserCommands;
 using CrmBackend.Domain.Constants;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using CrmBackend.Domain.Services;
 
 namespace CrmBackend.Web.Controllers;
 
@@ -16,15 +18,21 @@ public class UserController : ControllerBase
     private readonly GetAllUsersHandler _getAllUsersHandler;
     private readonly GetUsersByBranchIdHandler _getUsersByBranchIdHandler;
     private readonly ResetUserPasswordHandler _resetUserPasswordHandler;
+    private readonly EditUserCommandHandler _editUserCommandHandler;
+    private readonly IUserRepository _userRepository;
 
     public UserController(
         GetAllUsersHandler getAllUsersHandler,
         GetUsersByBranchIdHandler getUsersByBranchIdHandler,
-        ResetUserPasswordHandler resetUserPasswordHandler)
+        ResetUserPasswordHandler resetUserPasswordHandler,
+        EditUserCommandHandler editUserCommandHandler,
+        IUserRepository userRepository)
     {
         _getAllUsersHandler = getAllUsersHandler;
         _getUsersByBranchIdHandler = getUsersByBranchIdHandler;
         _resetUserPasswordHandler = resetUserPasswordHandler;
+        _editUserCommandHandler = editUserCommandHandler;
+        _userRepository = userRepository;
     }
 
     [Authorize(Policy = PermissionConstants.Users.View)] // 🔥 عرض جميع المستخدمين
@@ -67,4 +75,36 @@ public class UserController : ControllerBase
         await _resetUserPasswordHandler.Handle(command);
         return Ok();
     }
+
+    [Authorize(Policy = PermissionConstants.Users.Edit)]
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Edit(Guid id, [FromBody] EditUserCommand command)
+    {
+        if (id != command.Id)
+            return BadRequest("ID mismatch");
+
+        await _editUserCommandHandler.Handle(command);
+        return NoContent();
+    }
+    [Authorize(Policy = PermissionConstants.Users.View)]
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(Guid id)
+    {
+        var user = await _userRepository.GetByIdAsync(id); // أو GetByIdAsync(id)
+
+        if (user == null)
+            return NotFound();
+
+        return Ok(user);
+    }
+
+    [Authorize(Policy = PermissionConstants.Users.Delete)]
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        await _userRepository.SoftDeleteAsync(id);
+        return NoContent();
+    }
+
+
 }

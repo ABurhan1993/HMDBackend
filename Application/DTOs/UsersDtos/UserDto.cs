@@ -10,6 +10,8 @@ public class UserDto
     public string Phone { get; set; }
     public string RoleName { get; set; }
     public string BranchName { get; set; }
+    public DateTime? CreatedDate { get; set; }
+    public DateTime? UpdatedDate { get; set; }
 
     public static UserDto FromEntity(User u) => new()
     {
@@ -18,6 +20,9 @@ public class UserDto
         Email = u.Email,
         Phone = u.Phone,
         RoleName = u.Role?.Name ?? "",
-        BranchName = u.Branch?.Name ?? ""
+        BranchName = u.Branch?.Name ?? "",
+        CreatedDate = u.CreatedDate,
+        UpdatedDate = u.UpdatedDate
     };
+
 }

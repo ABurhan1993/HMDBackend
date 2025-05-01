@@ -51,5 +51,21 @@ public class UserRepository : IUserRepository
             .Where(u => u.BranchId == branchId && !u.IsDeleted && u.IsActive)
             .ToListAsync();
     }
+    public async Task SaveAsync()
+    {
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task SoftDeleteAsync(Guid id)
+    {
+        var user = await _context.Users.FindAsync(id);
+        if (user == null) throw new Exception("User not found.");
+
+        user.IsDeleted = true;
+        user.IsActive = false;
+        user.UpdatedDate = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+    }
 
 }

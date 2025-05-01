@@ -56,6 +56,8 @@ namespace CrmBackend.Domain.Entities
         public int? ExistingInquiryId { get; set; }
         public Inquiry? ExistingInquiry { get; set; }
         public virtual ICollection<InquiryWorkscope> InquiryWorkscopes { get; set; } = new List<InquiryWorkscope>();
+        public ICollection<InquiryTask> InquiryTasks { get; set; } = new List<InquiryTask>();
+
 
     }
 }

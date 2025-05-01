@@ -37,7 +37,7 @@ public class CreateUserCommandHandler
             BranchId = command.BranchId,
             RoleId = command.RoleId,
             CreatedBy = command.CreatedBy,
-            CreatedDate = DateTime.UtcNow,
+            IsNotificationEnabled =command.IsNotificationEnabled,
             IsActive = true,
             IsDeleted = false
         };

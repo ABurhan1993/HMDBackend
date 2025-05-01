@@ -10,5 +10,7 @@ public interface IUserRepository
     Task AddAsync(User user);
     IQueryable<User> Query();
     Task<List<User>> GetUsersByBranchIdAsync(int branchId);
+    Task SoftDeleteAsync(Guid id);
+    Task SaveAsync();
 
 }

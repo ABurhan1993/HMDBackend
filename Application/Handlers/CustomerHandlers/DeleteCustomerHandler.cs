@@ -21,6 +21,7 @@ public class DeleteCustomerHandler
         if (user == null) throw new Exception("User not found");
 
         customer.IsDeleted = true;
+        customer.IsActive = false;
         customer.UpdatedBy = command.DeletedBy;
         customer.UpdatedDate = DateTime.UtcNow;
 
