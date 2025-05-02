@@ -102,13 +102,13 @@ public class CustomerRepository : ICustomerRepository
         return await _context.Customers
             .Include(c => c.Branch)
             .Include(c => c.CustomerAssignedToUser)
-            .FirstOrDefaultAsync(c => c.CustomerContact == phone);
+            .FirstOrDefaultAsync(c => c.CustomerContact == phone && c.IsActive == true && c.IsDeleted == false);
     }
 
     public async Task<List<CustomerCountByUserDto>> GetCountGroupedByCreatedByAsync(int branchId)
     {
         return await _context.Customers
-            .Where(c => c.BranchId == branchId && c.UserId != null)
+            .Where(c => c.BranchId == branchId && c.UserId != null && c.IsActive == true && c.IsDeleted == false)
             .GroupBy(c => new { c.UserId, c.User.FullName })
             .Select(g => new CustomerCountByUserDto
             {
@@ -122,7 +122,7 @@ public class CustomerRepository : ICustomerRepository
     public async Task<List<CustomerCountByUserDto>> GetCountGroupedByAssignedToAsync(int branchId)
     {
         return await _context.Customers
-            .Where(c => c.BranchId == branchId && c.CustomerAssignedTo != null)
+            .Where(c => c.BranchId == branchId && c.CustomerAssignedTo != null && c.IsActive == true && c.IsDeleted == false)
             .GroupBy(c => new { c.CustomerAssignedTo, c.CustomerAssignedToUser.FullName })
             .Select(g => new CustomerCountByUserDto
             {

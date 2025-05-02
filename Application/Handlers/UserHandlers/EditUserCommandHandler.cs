@@ -21,6 +21,7 @@ public class EditUserCommandHandler
 
         user.FirstName = command.FirstName;
         user.LastName = command.LastName;
+        user.FullName = $"{command.FirstName} {command.LastName}".Trim(); // ← الإضافة هنا
         user.Email = command.Email;
         user.Phone = command.Phone;
         user.RoleId = command.RoleId;
@@ -30,4 +31,5 @@ public class EditUserCommandHandler
 
         await _userRepository.SaveAsync();
     }
+
 }
