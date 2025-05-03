@@ -1,4 +1,6 @@
 ﻿using CrmBackend.Application.Commands.CustomerCommands;
+using CrmBackend.Application.DTOs.NotificationDtos;
+using CrmBackend.Application.Interfaces.Notifications;
 using CrmBackend.Domain.Entities;
 using CrmBackend.Domain.Enums;
 using CrmBackend.Domain.Services;
@@ -11,15 +13,18 @@ public class CreateCustomerCommandHandler
     private readonly ICustomerRepository _customerRepository;
     private readonly IUserRepository _userRepository;
     private readonly ICustomerCommentRepository _customerCommentRepository;
+    private readonly INotificationDispatcher _notificationDispatcher;
 
     public CreateCustomerCommandHandler(
         ICustomerRepository customerRepository,
         IUserRepository userRepository,
-        ICustomerCommentRepository customerCommentRepository)
+        ICustomerCommentRepository customerCommentRepository,
+        INotificationDispatcher notificationDispatcher)
     {
         _customerRepository = customerRepository;
         _userRepository = userRepository;
         _customerCommentRepository = customerCommentRepository;
+        _notificationDispatcher = notificationDispatcher;
     }
 
     public async Task<int> Handle(CreateCustomerCommand command)
@@ -74,6 +79,16 @@ public class CreateCustomerCommandHandler
             await _customerCommentRepository.AddAsync(comment);
         }
 
+        if (command.CustomerAssignedTo.HasValue)
+        {
+            await _notificationDispatcher.DispatchAsync(new NotificationMessageDto
+            {
+                ReceiverUserId = command.CustomerAssignedTo.Value,
+                Title = "New Customer Assigned",
+                Message = $"Customer {customer.CustomerName} has been assigned to you.",
+                Url = $"/customers/{customer.CustomerId}"
+            });
+        }
         return customer.CustomerId;
     }
 }

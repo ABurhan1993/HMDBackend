@@ -1,5 +1,7 @@
 ﻿using CrmBackend.Application.Commands.InquiryCommands;
+using CrmBackend.Application.DTOs.NotificationDtos;
 using CrmBackend.Application.Interfaces;
+using CrmBackend.Application.Interfaces.Notifications;
 using CrmBackend.Domain.Services;
 
 namespace CrmBackend.Application.Handlers.InquiryHandlers
@@ -8,19 +10,22 @@ namespace CrmBackend.Application.Handlers.InquiryHandlers
     {
         private readonly IInquiryRepository _inquiryRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly INotificationDispatcher _notificationDispatcher;
 
-        public AddInquiryCommandHandler(IInquiryRepository inquiryRepository, IHttpContextAccessor httpContextAccessor)
+        public AddInquiryCommandHandler(
+    IInquiryRepository inquiryRepository,
+    IHttpContextAccessor httpContextAccessor,
+    INotificationDispatcher notificationDispatcher // ✅ جديد
+)
         {
             _inquiryRepository = inquiryRepository;
             _httpContextAccessor = httpContextAccessor;
+            _notificationDispatcher = notificationDispatcher;
         }
 
         public async Task<int> Handle(AddInquiryCommand command, Guid userId, int branchId)
         {
             var request = command.Request;
-
-            if (!PhoneValidator.IsValidUAEPhone(request.CustomerContact))
-                throw new Exception("Phone number must start with '971' and be 12 digits.");
 
             // ✅ استرجاع الكوستمر مرة واحدة فقط
             var customer = request.CustomerId.HasValue && request.CustomerId.Value > 0
@@ -49,6 +54,30 @@ namespace CrmBackend.Application.Handlers.InquiryHandlers
 
             // ✅ حفظ
             await _inquiryRepository.SaveChangesAsync();
+
+            // ✅ إشعار للمستخدم المكلّف بالقياس
+            if (request.MeasurementAssignedTo.HasValue)
+            {
+                await _notificationDispatcher.DispatchAsync(new NotificationMessageDto
+                {
+                    ReceiverUserId = request.MeasurementAssignedTo.Value,
+                    Title = "Measurement Assignment",
+                    Message = $"You have been assigned to take measurements for customer {customer.CustomerName}.",
+                    Url = $"/inquiries/{inquiry.InquiryId}"
+                });
+            }
+
+            if (request.CustomerAssignedTo.HasValue)
+            {
+                await _notificationDispatcher.DispatchAsync(new NotificationMessageDto
+                {
+                    ReceiverUserId = request.CustomerAssignedTo.Value,
+                    Title = "New Customer Assigned",
+                    Message = $"Customer {customer.CustomerName} has been assigned to you.",
+                    Url = $"/customers/{customer.CustomerId}"
+                });
+            }
+
 
             return inquiry.InquiryId;
         }

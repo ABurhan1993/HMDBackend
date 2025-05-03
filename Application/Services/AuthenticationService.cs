@@ -39,7 +39,7 @@ public class AuthenticationService : IAuthenticationService
         {
             foreach (var permission in permissions)
             {
-                claims.Add(new Claim("Permission", permission));
+                claims.Add(new Claim("permission", permission));
             }
         }
 

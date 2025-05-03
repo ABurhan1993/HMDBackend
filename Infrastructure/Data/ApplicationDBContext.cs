@@ -26,6 +26,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<TaskFile> TaskFiles { get; set; }
     public DbSet<Measurement> Measurements { get; set; }
     public DbSet<Design> Designs { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

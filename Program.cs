@@ -22,12 +22,50 @@ using CrmBackend.Application.Handlers.RoleHandlers;
 using CrmBackend.Application.Handlers.InquiryHandlers;
 using CrmBackend.Application.CustomerHandlers;
 using CrmBackend.Application.Handlers.UserClaimHandlers;
+using CrmBackend.Application.Interfaces.Notifications;
+using CrmBackend.Domain.Interfaces;
+using CrmBackend.Infrastructure.Services.Notifications;
+using CrmBackend.WebAPI.Hubs;
+using System.Security.Claims;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddSignalR();
+
 // Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header,
+            },
+            new List<string>()
+        }
+    });
+});
+
 
 // CORS
 builder.Services.AddCors(options =>
@@ -83,6 +121,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/notification"))
+                {
+                    context.Token = accessToken;
+                }
+
+                return Task.CompletedTask;
+            }
+        };
+
+        // 👇 مهم جدًا لتحديد userId من ClaimTypes.NameIdentifier
+        options.TokenValidationParameters.NameClaimType = ClaimTypes.NameIdentifier;
     });
 
 // Repositories
@@ -94,6 +151,8 @@ builder.Services.AddScoped<IBranchRepository, BranchRepository>();
 builder.Services.AddScoped<IInquiryRepository, InquiryRepository>();
 builder.Services.AddScoped<IRoleClaimRepository, RoleClaimRepository>();
 builder.Services.AddScoped<IUserClaimRepository, UserClaimRepository>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+
 
 // Services
 builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
@@ -143,6 +202,12 @@ builder.Services.AddScoped<DeleteUserClaimHandler>();
 
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionOrHandler>();
 
+
+
+builder.Services.AddScoped<INotificationDispatcher, NotificationDispatcher>();
+builder.Services.AddScoped<INotificationChannel, WebNotificationChannel>();
+builder.Services.AddScoped<INotificationChannel, SignalRNotificationChannel>();
+
 // Controllers
 builder.Services.AddControllers();
 
@@ -166,7 +231,11 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+
 }
 
-app.MapControllers();
+app.MapControllers(); 
+app.MapHub<NotificationHub>("/hubs/notification").RequireCors("AllowFrontend");
+
 app.Run();
