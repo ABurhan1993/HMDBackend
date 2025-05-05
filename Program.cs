@@ -28,6 +28,7 @@ using CrmBackend.Infrastructure.Services.Notifications;
 using CrmBackend.WebAPI.Hubs;
 using System.Security.Claims;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -220,6 +221,26 @@ app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/json";
+
+        var error = context.Features.Get<IExceptionHandlerFeature>();
+        if (error != null)
+        {
+            await context.Response.WriteAsJsonAsync(new
+            {
+                error = "An unexpected error occurred.",
+                details = error.Error.Message
+            });
+        }
+    });
+});
+
+
 // Seed Data
 using (var scope = app.Services.CreateScope())
 {
@@ -235,6 +256,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 
 
 }
+app.UseCors("AllowFrontend");
 
 app.MapControllers(); 
 app.MapHub<NotificationHub>("/hubs/notification").RequireCors("AllowFrontend");
