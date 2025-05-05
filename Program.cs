@@ -258,7 +258,10 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 }
 app.UseCors("AllowFrontend");
 
-app.MapControllers(); 
-app.MapHub<NotificationHub>("/hubs/notification").RequireCors("AllowFrontend");
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHub<NotificationHub>("/hubs/notification");
+});
 
 app.Run();
