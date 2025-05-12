@@ -1,9 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "2evyBxxzj8/nqG41J1FHmlb0YofrEXHz4khOyBmqVMXGRobHgZmRpUs7OSQUizO7AzyneaIKP1q4lJmHlL9y5g==",
+  "dgSpecHash": "eScV+RtnGyz0td9H9QmRB8lnn0NRyHfAy3gmSFZS1mSGCSleuWVsbM9IWqU2ExLv4hkVMVF+BwQ3fQx4986tgA==",
   "success": true,
   "projectFilePath": "C:\\Users\\SAI Kitchen\\Desktop\\MhdCRM\\CrmBackend\\CrmBackend.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\SAI Kitchen\\.nuget\\packages\\awssdk.core\\4.0.0.3\\awssdk.core.4.0.0.3.nupkg.sha512",
+    "C:\\Users\\SAI Kitchen\\.nuget\\packages\\awssdk.s3\\4.0.0.3\\awssdk.s3.4.0.0.3.nupkg.sha512",
     "C:\\Users\\SAI Kitchen\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\SAI Kitchen\\.nuget\\packages\\mediatr\\12.0.1\\mediatr.12.0.1.nupkg.sha512",
     "C:\\Users\\SAI Kitchen\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",

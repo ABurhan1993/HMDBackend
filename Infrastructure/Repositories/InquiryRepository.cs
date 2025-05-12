@@ -42,8 +42,25 @@ namespace CrmBackend.Infrastructure.Repositories
 
             _context.Customers.Add(newCustomer);
             await _context.SaveChangesAsync();
+
+            // ✅ إضافة Comment إذا كانت الملاحظات موجودة
+            if (!string.IsNullOrWhiteSpace(request.CustomerNotes))
+            {
+                var comment = new CustomerComment
+                {
+                    CustomerId = newCustomer.CustomerId,
+                    CustomerCommentDetail = request.CustomerNotes.Trim(),
+                    CommentAddedBy = userId,
+                    CommentAddedOn = DateTime.UtcNow
+                };
+
+                _context.CustomerComments.Add(comment);
+                await _context.SaveChangesAsync();
+            }
+
             return newCustomer;
         }
+
 
 
         public async Task<Building> AddBuildingAsync(CreateInquiryRequest request, Guid userId)
@@ -127,6 +144,7 @@ namespace CrmBackend.Infrastructure.Repositories
                 .Include(i => i.InquiryWorkscopes)
                     .ThenInclude(iw => iw.DesignAssignedUser)
                 .Include(i => i.ManagedByUser)
+                .Include(i => i.Comments).ThenInclude(c => c.CommentAddedByUser)
                 .Where(i => i.BranchId == branchId && i.IsActive && !i.IsDeleted)
                 .Select(i => new InquiryListDto
                 {
@@ -159,7 +177,9 @@ namespace CrmBackend.Infrastructure.Repositories
                     BuildingReconstruction = i.Building.BuildingReconstruction,
                     IsOccupied = i.Building.IsOccupied,
 
+
                     // ✅ Workscope Info
+                    WorkscopeNames = i.InquiryWorkscopes.Select(w => w.InquiryWorkscopeDetailName).ToList(),
                     WorkscopeDetails = i.InquiryWorkscopes.Select(w => new InquiryWorkscopeDisplayDto
                     {
                         WorkscopeName = w.WorkScope.WorkScopeName,
@@ -176,6 +196,15 @@ namespace CrmBackend.Infrastructure.Repositories
                         FeedbackReaction = w.FeedbackReaction.ToString(),
                         IsMeasurementReschedule = w.IsMeasurementReschedule,
                         IsDesignReschedule = w.IsDesignReschedule
+                    }).ToList(),
+
+                    Comments = i.Comments.Select(c => new InquiryCommentDto
+                    {
+                        CommentName = c.CommentName,
+                        CommentDetail = c.CommentDetail,
+                        AddedBy = c.CommentAddedByUser.FullName ?? "",
+                        AddedOn = c.CommentAddedOn,
+                        NextFollowup = c.CommentNextFollowup
                     }).ToList()
                 })
                 .ToListAsync();
@@ -189,6 +218,7 @@ namespace CrmBackend.Infrastructure.Repositories
         public async Task UpdateCustomerAsyncIfNeeded(Customer customer, CreateInquiryRequest request, Guid userId)
         {
             bool hasChanges = false;
+            string? newCommentFromNote = null;
 
             void SetIfChanged<T>(T currentValue, T newValue, Action<T> updateAction)
             {
@@ -207,7 +237,12 @@ namespace CrmBackend.Infrastructure.Repositories
             SetIfChanged(customer.CustomerCity, request.CustomerCity, val => customer.CustomerCity = val);
             SetIfChanged(customer.CustomerCountry, request.CustomerCountry, val => customer.CustomerCountry = val);
             SetIfChanged(customer.CustomerNationality, request.CustomerNationality, val => customer.CustomerNationality = val);
-            SetIfChanged(customer.CustomerNotes, request.CustomerNotes, val => customer.CustomerNotes = val);
+
+            SetIfChanged(customer.CustomerNotes, request.CustomerNotes, val =>
+            {
+                customer.CustomerNotes = val;
+                newCommentFromNote = val;
+            });
 
             var meetingDateUtc = request.CustomerNextMeetingDate?.ToUniversalTime();
             SetIfChanged(
@@ -215,7 +250,6 @@ namespace CrmBackend.Infrastructure.Repositories
                 meetingDateUtc?.Date,
                 val => customer.CustomerNextMeetingDate = meetingDateUtc
             );
-
 
             SetIfChanged(customer.ContactStatus, (ContactStatus)request.ContactStatus, val => customer.ContactStatus = val);
             SetIfChanged(customer.WayOfContact, (WayOfContact)request.WayOfContact, val => customer.WayOfContact = val);
@@ -229,10 +263,132 @@ namespace CrmBackend.Infrastructure.Repositories
                 customer.UpdatedDate = DateTime.UtcNow;
 
                 _context.Customers.Update(customer);
+
+                if (!string.IsNullOrWhiteSpace(newCommentFromNote))
+                {
+                    var comment = new CustomerComment
+                    {
+                        CustomerId = customer.CustomerId,
+                        CustomerCommentDetail = newCommentFromNote.Trim(),
+                        CommentAddedBy = userId,
+                        CommentAddedOn = DateTime.UtcNow
+                    };
+
+                    _context.CustomerComments.Add(comment);
+                }
+
                 await _context.SaveChangesAsync();
             }
         }
 
+        public async Task<List<InquiryListDto>> GetMeasurementAssignmentRequestsAsync(Guid userId)
+        {
+            return await _context.Inquiries
+                .Include(i => i.Customer)
+                .Include(i => i.Building)
+                .Include(i => i.InquiryWorkscopes)
+                    .ThenInclude(iw => iw.WorkScope)
+                .Include(i => i.InquiryWorkscopes)
+                    .ThenInclude(iw => iw.MeasurementAssignedUser)
+                .Include(i => i.InquiryWorkscopes)
+                    .ThenInclude(iw => iw.DesignAssignedUser)
+                .Include(i => i.ManagedByUser)
+                .Include(i => i.Comments).ThenInclude(c => c.CommentAddedByUser)
+                .Where(i =>
+                    i.InquiryWorkscopes.Any(ws => ws.MeasurementAssignedTo == userId) &&
+                    i.Status == InquiryStatus.MeasurementAssigneePending)
+                .Select(i => new InquiryListDto
+                {
+                    InquiryId = i.InquiryId,
+                    InquiryCode = i.InquiryCode,
+                    InquiryDescription = i.InquiryDescription,
+                    InquiryStartDate = i.InquiryStartDate,
+                    InquiryEndDate = i.InquiryEndDate,
+                    InquiryStatusName = i.Status.ToString(),
+                    ManagedByUserName = i.ManagedByUser.FullName,
+
+                    IsMeasurementProvidedByCustomer = i.IsMeasurementProvidedByCustomer,
+                    IsDesignProvidedByCustomer = i.IsDesignProvidedByCustomer,
+
+                    // ✅ Customer Info
+                    CustomerName = i.Customer.CustomerName,
+                    CustomerContact = i.Customer.CustomerContact,
+                    CustomerEmail = i.Customer.CustomerEmail,
+                    CustomerNotes = i.Customer.CustomerNotes,
+                    CustomerNextMeetingDate = i.Customer.CustomerNextMeetingDate,
+                    ContactStatus = i.Customer.ContactStatus.ToString(),
+                    WayOfContact = i.Customer.WayOfContact.ToString(),
+
+                    // ✅ Building Info
+                    BuildingAddress = i.Building.BuildingAddress,
+                    BuildingMakaniMap = i.Building.BuildingMakaniMap,
+                    BuildingTypeOfUnit = i.Building.BuildingTypeOfUnit,
+                    BuildingCondition = i.Building.BuildingCondition,
+                    BuildingFloor = i.Building.BuildingFloor,
+                    BuildingReconstruction = i.Building.BuildingReconstruction,
+                    IsOccupied = i.Building.IsOccupied,
+
+
+                    // ✅ Workscope Info
+                    WorkscopeNames = i.InquiryWorkscopes.Select(w => w.InquiryWorkscopeDetailName).ToList(),
+                    WorkscopeDetails = i.InquiryWorkscopes.Select(w => new InquiryWorkscopeDisplayDto
+                    {
+                        WorkscopeName = w.WorkScope.WorkScopeName,
+                        InquiryWorkscopeDetailName = w.InquiryWorkscopeDetailName,
+                        InquiryStatus = w.InquiryStatus.ToString(),
+                        MeasurementAssignedTo = w.MeasurementAssignedUser.FullName,
+                        DesignAssignedTo = w.DesignAssignedUser.FullName,
+                        MeasurementScheduleDate = w.MeasurementScheduleDate,
+                        DesignScheduleDate = w.DesignScheduleDate,
+                        MeasurementAddedOn = w.MeasurementAddedOn,
+                        DesignAddedOn = w.DesignAddedOn,
+                        IsDesignApproved = w.IsDesignApproved,
+                        IsDesignSentToCustomer = w.IsDesignSentToCustomer,
+                        FeedbackReaction = w.FeedbackReaction.ToString(),
+                        IsMeasurementReschedule = w.IsMeasurementReschedule,
+                        IsDesignReschedule = w.IsDesignReschedule
+                    }).ToList(),
+
+                    Comments = i.Comments.Select(c => new InquiryCommentDto
+                    {
+                        CommentName = c.CommentName,
+                        CommentDetail = c.CommentDetail,
+                        AddedBy = c.CommentAddedByUser.FullName ?? "",
+                        AddedOn = c.CommentAddedOn,
+                        NextFollowup = c.CommentNextFollowup
+                    }).ToList()
+                })
+                .ToListAsync();
+        }
+
+        public async Task<Inquiry?> GetByIdAsync(int inquiryId)
+        {
+            return await _context.Inquiries.FirstOrDefaultAsync(i => i.InquiryId == inquiryId);
+        }
+        public async Task AddCommentAsync(Comment comment)
+        {
+            try {
+                _context.Comments.Add(comment);
+                await _context.SaveChangesAsync();
+            }
+             catch (Exception ex)
+            {
+                Console.WriteLine("❌ Error: " + ex.Message);
+                throw;
+            }
+        }
+        public async Task<Inquiry?> GetByIdWithWorkscopesAsync(int inquiryId)
+        {
+            return await _context.Inquiries
+                .Include(i => i.InquiryWorkscopes)
+                .FirstOrDefaultAsync(i => i.InquiryId == inquiryId);
+        }
+
+        public async Task UpdateAsync(Inquiry inquiry)
+        {
+            _context.Inquiries.Update(inquiry);
+            await _context.SaveChangesAsync();
+        }
         public async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();

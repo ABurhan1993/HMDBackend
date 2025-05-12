@@ -40,6 +40,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "AWSSDK.S3": {
+              "target": "Package",
+              "version": "[4.0.0.3, )"
+            },
             "MediatR": {
               "target": "Package",
               "version": "[12.0.1, )"

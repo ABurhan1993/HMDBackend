@@ -28,8 +28,8 @@ public class InquiryListDto
     // Building
     public string BuildingAddress { get; set; }
     public string BuildingMakaniMap { get; set; }
-    public BuildingTypeOfUnit BuildingTypeOfUnit { get; set; }
-    public BuildingCondition BuildingCondition { get; set; }
+    public BuildingTypeOfUnit? BuildingTypeOfUnit { get; set; }
+    public BuildingCondition? BuildingCondition { get; set; }
     public string BuildingFloor { get; set; }
     public bool? BuildingReconstruction { get; set; }
     public bool? IsOccupied { get; set; }
@@ -39,6 +39,8 @@ public class InquiryListDto
 
     // Workscope Details
     public List<InquiryWorkscopeDisplayDto> WorkscopeDetails { get; set; } = new();
+    public List<InquiryCommentDto> Comments { get; set; } = new();
+
 }
 
 public class InquiryWorkscopeDisplayDto

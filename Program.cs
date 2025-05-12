@@ -29,6 +29,7 @@ using CrmBackend.WebAPI.Hubs;
 using System.Security.Claims;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Diagnostics;
+using CrmBackend.Application.Handlers.MesurementHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -154,6 +155,8 @@ builder.Services.AddScoped<IInquiryRepository, InquiryRepository>();
 builder.Services.AddScoped<IRoleClaimRepository, RoleClaimRepository>();
 builder.Services.AddScoped<IUserClaimRepository, UserClaimRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddScoped<IInquiryTaskRepository, InquiryTaskRepository>();
+builder.Services.AddScoped<IMeasurementRepository, MeasurementRepository>();
 
 
 // Services
@@ -201,6 +204,11 @@ builder.Services.AddScoped<GetInquiriesForDisplayHandler>();
 builder.Services.AddScoped<AddUserClaimHandler>();
 builder.Services.AddScoped<DeleteUserClaimHandler>();
 
+builder.Services.AddScoped<GetMeasurementAssignmentRequestsHandler>();
+builder.Services.AddScoped<ApproveMeasurementAssignmentCommandHandler>();
+builder.Services.AddScoped<RejectMeasurementAssignmentCommandHandler>();
+
+
 
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionOrHandler>();
 
@@ -209,6 +217,8 @@ builder.Services.AddSingleton<IAuthorizationHandler, PermissionOrHandler>();
 builder.Services.AddScoped<INotificationDispatcher, NotificationDispatcher>();
 builder.Services.AddScoped<INotificationChannel, WebNotificationChannel>();
 builder.Services.AddScoped<INotificationChannel, SignalRNotificationChannel>();
+builder.Services.AddScoped<IFileUploader, S3FileUploader>();
+
 
 // Controllers
 builder.Services.AddControllers();

@@ -13,6 +13,13 @@ namespace CrmBackend.Application.Interfaces
         Task<List<InquiryListDto>> GetAllForDisplayAsync(int branchId);
         Task<Customer?> GetCustomerByIdAsync(int customerId);
         Task UpdateCustomerAsyncIfNeeded(Customer customer, CreateInquiryRequest request, Guid userId);
+        Task<List<InquiryListDto>> GetMeasurementAssignmentRequestsAsync(Guid userId);
+        Task<Inquiry?> GetByIdAsync(int inquiryId);
+        Task AddCommentAsync(Comment comment);
+        Task<Inquiry?> GetByIdWithWorkscopesAsync(int inquiryId);
+
+        Task UpdateAsync(Inquiry inquiry);
+
         Task SaveChangesAsync();
     }
 }

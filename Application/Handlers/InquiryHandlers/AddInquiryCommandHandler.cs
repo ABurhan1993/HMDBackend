@@ -55,6 +55,10 @@ namespace CrmBackend.Application.Handlers.InquiryHandlers
             // ✅ حفظ
             await _inquiryRepository.SaveChangesAsync();
 
+            inquiry.InquiryCode = $"IN{branchId}{customer.CustomerId}{inquiry.InquiryId}";
+            await _inquiryRepository.UpdateAsync(inquiry); // أو حفظ مباشر
+
+
             // ✅ إشعار للمستخدم المكلّف بالقياس
             if (request.MeasurementAssignedTo.HasValue)
             {

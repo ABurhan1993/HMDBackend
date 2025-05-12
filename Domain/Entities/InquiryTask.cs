@@ -2,11 +2,15 @@
 using CrmBackend.Domain.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace CrmBackend.Domain.Entities;
 
 public class InquiryTask : AuditableEntity
 {
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
 
     // ✅ الإلزامي: ربط مع الاستفسار
@@ -20,8 +24,8 @@ public class InquiryTask : AuditableEntity
     public TaskType TaskType { get; set; } // Measurement, Design, etc.
 
     public string TaskName { get; set; }
-    public string TaskDescription { get; set; }
-    public string TaskComment { get; set; }
+    public string? TaskDescription{ get; set; }
+    public string? TaskComment{ get; set; }
 
     public DateTime? ScheduledDate { get; set; }
 
