@@ -34,7 +34,7 @@ public class RoleRepository : IRoleRepository
 
     public async Task<List<Role>> GetAllAsync()
     {
-        return await _context.Roles
+        return await _context.Roles.Where(r => r.IsActive && !r.IsDeleted)
             .Include(r => r.RoleClaims) // 🔥 هي المهمة
             .ToListAsync();
     }

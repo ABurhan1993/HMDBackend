@@ -17,7 +17,7 @@ public class NotificationRepository : INotificationRepository
     public async Task<List<Notification>> GetUserNotificationsAsync(Guid userId)
     {
         return await _context.Notifications
-            .Where(n => n.ReceiverUserId == userId && !n.IsDeleted)
+            .Where(n => n.ReceiverUserId == userId && n.IsActive && !n.IsDeleted)
             .OrderByDescending(n => n.CreatedDate)
             .ToListAsync();
     }

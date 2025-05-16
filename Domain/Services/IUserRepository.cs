@@ -10,6 +10,7 @@ public interface IUserRepository
     Task AddAsync(User user);
     IQueryable<User> Query();
     Task<List<User>> GetUsersByBranchIdAsync(int branchId);
+    Task<List<User>> GetUsersByRoleNameAsync(string roleName);
     Task SoftDeleteAsync(Guid id);
     Task SaveAsync();
 

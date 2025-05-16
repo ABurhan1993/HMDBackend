@@ -11,12 +11,14 @@ namespace CrmBackend.Application.Interfaces
         Task AddInquiryWorkscopesAsync(int inquiryId, CreateInquiryRequest request, Guid userId);
 
         Task<List<InquiryListDto>> GetAllForDisplayAsync(int branchId);
+        Task<List<InquiryListDto>> GetMeasurementApprovalsAsync(int branchId, Guid currentUserId);
         Task<Customer?> GetCustomerByIdAsync(int customerId);
         Task UpdateCustomerAsyncIfNeeded(Customer customer, CreateInquiryRequest request, Guid userId);
         Task<List<InquiryListDto>> GetMeasurementAssignmentRequestsAsync(Guid userId);
         Task<Inquiry?> GetByIdAsync(int inquiryId);
         Task AddCommentAsync(Comment comment);
-        Task<Inquiry?> GetByIdWithWorkscopesAsync(int inquiryId);
+        Task<Inquiry?> GetByIdWithWorkscopesAndTasksAsync(int inquiryId);
+        Task<List<Inquiry>> GetMeasurementInquiriesInProgressAsync(Guid userId);
 
         Task UpdateAsync(Inquiry inquiry);
 

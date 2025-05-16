@@ -34,7 +34,7 @@ namespace CrmBackend.Infrastructure.Repositories
 
         public async Task<List<Branch>> GetAllAsync()
         {
-            return await _context.Branches.ToListAsync();
+            return await _context.Branches.Where(b => b.IsActive && !b.IsDeleted).ToListAsync();
         }
     }
 }

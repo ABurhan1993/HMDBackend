@@ -23,7 +23,7 @@ namespace CrmBackend.Infrastructure.Repositories
         public async Task<List<CustomerComment>> GetByCustomerIdAsync(int customerId)
         {
             return await _context.CustomerComments.Include(c => c.CommentAddedByNavigation)
-                .Where(c => c.CustomerId == customerId && !c.IsDeleted)
+                .Where(c => c.CustomerId == customerId && c.IsActive && !c.IsDeleted)
                 .OrderByDescending(c => c.CommentAddedOn)
                 .ToListAsync();
         }

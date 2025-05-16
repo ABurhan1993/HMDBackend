@@ -22,7 +22,7 @@ namespace CrmBackend.WebAPI.Controllers
                 return BadRequest("File is empty.");
 
             using var stream = file.File.OpenReadStream();
-            var url = await _uploader.UploadFileAsync(stream, file.File.FileName, file.File.ContentType);
+            var url = await _uploader.UploadFileAsync(stream, file.File.FileName, file.File.ContentType,"");
 
             return Ok(new { Url = url });
         }

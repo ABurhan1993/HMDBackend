@@ -51,6 +51,15 @@ public class UserRepository : IUserRepository
             .Where(u => u.BranchId == branchId && !u.IsDeleted && u.IsActive)
             .ToListAsync();
     }
+    public async Task<List<User>> GetUsersByRoleNameAsync(string roleName)
+    {
+        return await _context.Users
+            .Include(u => u.Role)
+            .Where(u => u.Role.Name == roleName && u.IsActive && !u.IsDeleted)
+            .ToListAsync();
+    }
+
+
     public async Task SaveAsync()
     {
         await _context.SaveChangesAsync();

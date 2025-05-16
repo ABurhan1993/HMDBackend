@@ -210,6 +210,100 @@ namespace CrmBackend.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<InquiryListDto>> GetMeasurementApprovalsAsync(int branchId, Guid currentUserId)
+        {
+            return await _context.Inquiries
+                .Include(i => i.Customer)
+                .Include(i => i.Building)
+                .Include(i => i.InquiryWorkscopes)
+                    .ThenInclude(iw => iw.WorkScope)
+                .Include(i => i.InquiryWorkscopes)
+                    .ThenInclude(iw => iw.MeasurementAssignedUser)
+                .Include(i => i.InquiryWorkscopes)
+                    .ThenInclude(iw => iw.DesignAssignedUser)
+                .Include(i => i.ManagedByUser)
+                .Include(i => i.Comments).ThenInclude(c => c.CommentAddedByUser)
+                .Include(i => i.InquiryTasks)
+                .ThenInclude(t => t.Files)
+                .Where(i =>
+                    i.BranchId == branchId &&
+                    i.IsActive &&
+                    !i.IsDeleted &&
+                    i.Status == InquiryStatus.MeasurementWaitingForApproval &&
+                    i.ManagedBy == currentUserId
+                )
+                .Select(i => new InquiryListDto
+                {
+                    InquiryId = i.InquiryId,
+                    InquiryCode = i.InquiryCode,
+                    InquiryDescription = i.InquiryDescription,
+                    InquiryStartDate = i.InquiryStartDate,
+                    InquiryEndDate = i.InquiryEndDate,
+                    InquiryStatusName = i.Status.ToString(),
+                    ManagedByUserName = i.ManagedByUser.FullName,
+
+                    IsMeasurementProvidedByCustomer = i.IsMeasurementProvidedByCustomer,
+                    IsDesignProvidedByCustomer = i.IsDesignProvidedByCustomer,
+
+                    CustomerName = i.Customer.CustomerName,
+                    CustomerContact = i.Customer.CustomerContact,
+                    CustomerEmail = i.Customer.CustomerEmail,
+                    CustomerNotes = i.Customer.CustomerNotes,
+                    CustomerNextMeetingDate = i.Customer.CustomerNextMeetingDate,
+                    ContactStatus = i.Customer.ContactStatus.ToString(),
+                    WayOfContact = i.Customer.WayOfContact.ToString(),
+
+                    BuildingAddress = i.Building.BuildingAddress,
+                    BuildingMakaniMap = i.Building.BuildingMakaniMap,
+                    BuildingTypeOfUnit = i.Building.BuildingTypeOfUnit,
+                    BuildingCondition = i.Building.BuildingCondition,
+                    BuildingFloor = i.Building.BuildingFloor,
+                    BuildingReconstruction = i.Building.BuildingReconstruction,
+                    IsOccupied = i.Building.IsOccupied,
+
+                    WorkscopeNames = i.InquiryWorkscopes.Select(w => w.InquiryWorkscopeDetailName).ToList(),
+                    WorkscopeDetails = i.InquiryWorkscopes.Select(w => new InquiryWorkscopeDisplayDto
+                    {
+                        WorkscopeName = w.WorkScope.WorkScopeName,
+                        InquiryWorkscopeDetailName = w.InquiryWorkscopeDetailName,
+                        InquiryStatus = w.InquiryStatus.ToString(),
+                        MeasurementAssignedTo = w.MeasurementAssignedUser.FullName,
+                        DesignAssignedTo = w.DesignAssignedUser.FullName,
+                        MeasurementScheduleDate = w.MeasurementScheduleDate,
+                        DesignScheduleDate = w.DesignScheduleDate,
+                        MeasurementAddedOn = w.MeasurementAddedOn,
+                        DesignAddedOn = w.DesignAddedOn,
+                        IsDesignApproved = w.IsDesignApproved,
+                        IsDesignSentToCustomer = w.IsDesignSentToCustomer,
+                        FeedbackReaction = w.FeedbackReaction.ToString(),
+                        IsMeasurementReschedule = w.IsMeasurementReschedule,
+                        IsDesignReschedule = w.IsDesignReschedule
+                    }).ToList(),
+
+                    Comments = i.Comments.Select(c => new InquiryCommentDto
+                    {
+                        CommentName = c.CommentName,
+                        CommentDetail = c.CommentDetail,
+                        AddedBy = c.CommentAddedByUser.FullName ?? "",
+                        AddedOn = c.CommentAddedOn,
+                        NextFollowup = c.CommentNextFollowup
+                    }).ToList(),
+
+                    Files = i.InquiryTasks
+                    .Where(t => !t.IsDeleted)
+                    .SelectMany(t => t.Files.Select(f => new InquiryFileDisplayDto
+                    {
+                        FileName = f.FileName,
+                        FileUrl = f.FilePath,
+                        FileType = f.FileType,
+                        TaskType = t.TaskType.ToString()
+                    })).ToList(),
+
+                })
+                .ToListAsync();
+         }
+
+
         public async Task<Customer?> GetCustomerByIdAsync(int customerId)
         {
             return await _context.Customers.FindAsync(customerId);
@@ -294,7 +388,7 @@ namespace CrmBackend.Infrastructure.Repositories
                     .ThenInclude(iw => iw.DesignAssignedUser)
                 .Include(i => i.ManagedByUser)
                 .Include(i => i.Comments).ThenInclude(c => c.CommentAddedByUser)
-                .Where(i =>
+                .Where(i => i.IsActive && !i.IsDeleted && 
                     i.InquiryWorkscopes.Any(ws => ws.MeasurementAssignedTo == userId) &&
                     i.Status == InquiryStatus.MeasurementAssigneePending)
                 .Select(i => new InquiryListDto
@@ -377,12 +471,34 @@ namespace CrmBackend.Infrastructure.Repositories
                 throw;
             }
         }
-        public async Task<Inquiry?> GetByIdWithWorkscopesAsync(int inquiryId)
+        public async Task<Inquiry?> GetByIdWithWorkscopesAndTasksAsync(int inquiryId)
         {
             return await _context.Inquiries
-                .Include(i => i.InquiryWorkscopes)
-                .FirstOrDefaultAsync(i => i.InquiryId == inquiryId);
+                .Include(i => i.InquiryWorkscopes.Where(iw => iw.IsActive && !iw.IsDeleted))
+                .Include(i => i.InquiryTasks.Where(it => it.IsActive && !it.IsDeleted))
+                .FirstOrDefaultAsync(i => i.InquiryId == inquiryId && i.IsActive && !i.IsDeleted);
         }
+
+        public async Task<List<Inquiry>> GetMeasurementInquiriesInProgressAsync(Guid userId)
+        {
+            return await _context.Inquiries
+                .Include(i => i.Customer)
+                .Include(i => i.Building)
+                .Include(i => i.InquiryWorkscopes.Where(w => w.MeasurementAssignedTo == userId))
+                    .ThenInclude(w => w.WorkScope)
+                .Include(i => i.InquiryWorkscopes)
+                    .ThenInclude(w => w.MeasurementAssignedUser)
+                .Include(i => i.InquiryWorkscopes)
+                    .ThenInclude(w => w.DesignAssignedUser)
+                .Include(i => i.ManagedByUser)
+                .Include(i => i.Comments).ThenInclude(c => c.CommentAddedByUser)
+                .Where(i => i.IsActive && !i.IsDeleted &&
+                    (i.Status == InquiryStatus.MeasurementInProgress || i.Status == InquiryStatus.MeasurementRejected) &&
+                    i.InquiryWorkscopes.Any(w => w.MeasurementAssignedTo == userId))
+                .ToListAsync();
+        }
+
+
 
         public async Task UpdateAsync(Inquiry inquiry)
         {

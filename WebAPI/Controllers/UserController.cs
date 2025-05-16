@@ -106,5 +106,21 @@ public class UserController : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Policy = PermissionConstants.Users.View)]
+    [HttpGet("by-role/{roleName}")]
+    public async Task<IActionResult> GetUsersByRole(string roleName)
+    {
+        var users = await _userRepository.GetUsersByRoleNameAsync(roleName);
+        var result = users.Select(u => new
+        {
+            u.Id,
+            u.FullName
+        });
+
+        return Ok(result);
+    }
+
+
+
 
 }

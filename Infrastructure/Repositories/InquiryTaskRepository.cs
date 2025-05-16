@@ -36,8 +36,14 @@ public class InquiryTaskRepository : IInquiryTaskRepository
             .Include(t => t.Inquiry) // مهم حتى نقدر نعدّل حالة الاستفسار
             .FirstOrDefaultAsync(t =>
                 t.InquiryId == inquiryId &&
+                t.IsActive && !t.IsDeleted &&
                 t.AssignedToUserId == userId &&
                 t.TaskType == TaskType.Measurement);
+    }
+    public async Task<InquiryTask?> GetByInquiryIdAsync(int inquiryId)
+    {
+        return await _context.InquiryTasks
+            .FirstOrDefaultAsync(t => t.InquiryId == inquiryId && !t.IsDeleted);
     }
 
     public async Task UpdateAsync(InquiryTask task)

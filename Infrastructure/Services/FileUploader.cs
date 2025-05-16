@@ -21,12 +21,14 @@ public class S3FileUploader : IFileUploader
             Amazon.RegionEndpoint.GetBySystemName(_configuration["AWS:Region"]));
     }
 
-    public async Task<string> UploadFileAsync(Stream fileStream, string fileName, string contentType)
+    public async Task<string> UploadFileAsync(Stream fileStream, string fileName, string contentType, string path)
     {
+        var key = string.IsNullOrWhiteSpace(path) ? fileName : $"{path.TrimEnd('/')}/{fileName}";
+
         var uploadRequest = new TransferUtilityUploadRequest
         {
             InputStream = fileStream,
-            Key = fileName,
+            Key = key,
             BucketName = _bucketName,
             ContentType = contentType
         };
@@ -34,6 +36,6 @@ public class S3FileUploader : IFileUploader
         var fileTransferUtility = new TransferUtility(_s3Client);
         await fileTransferUtility.UploadAsync(uploadRequest);
 
-        return $"https://{_bucketName}.s3.{_configuration["AWS:Region"]}.amazonaws.com/{fileName}";
+        return $"https://{_bucketName}.s3.{_configuration["AWS:Region"]}.amazonaws.com/{key}";
     }
 }

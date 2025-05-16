@@ -30,6 +30,7 @@ using System.Security.Claims;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Diagnostics;
 using CrmBackend.Application.Handlers.MesurementHandlers;
+using CrmBackend.Application.Commands.MeasurementCommands;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -157,6 +158,8 @@ builder.Services.AddScoped<IUserClaimRepository, UserClaimRepository>();
 builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<IInquiryTaskRepository, InquiryTaskRepository>();
 builder.Services.AddScoped<IMeasurementRepository, MeasurementRepository>();
+builder.Services.AddScoped<IFileUploader, S3FileUploader>();
+builder.Services.AddScoped<ITaskFileRepository, TaskFileRepository>();
 
 
 // Services
@@ -207,8 +210,11 @@ builder.Services.AddScoped<DeleteUserClaimHandler>();
 builder.Services.AddScoped<GetMeasurementAssignmentRequestsHandler>();
 builder.Services.AddScoped<ApproveMeasurementAssignmentCommandHandler>();
 builder.Services.AddScoped<RejectMeasurementAssignmentCommandHandler>();
-
-
+builder.Services.AddScoped<GetMyMeasurementInquiriesHandler>();
+builder.Services.AddScoped<SubmitMeasurementTaskCommandHandler>();
+builder.Services.AddScoped<RejectMeasurementHandler>();
+builder.Services.AddScoped<ApproveMeasurementHandler>();
+builder.Services.AddScoped<GetMeasurementApprovalsHandler>();
 
 builder.Services.AddSingleton<IAuthorizationHandler, PermissionOrHandler>();
 

@@ -2,5 +2,5 @@
 
 public interface IFileUploader
 {
-    Task<string> UploadFileAsync(Stream fileStream, string fileName, string contentType);
+    Task<string> UploadFileAsync(Stream fileStream, string fileName, string contentType, string Path);
 }

@@ -92,7 +92,7 @@ public class CustomerRepository : ICustomerRepository
     {
         return await _context.Customers
             .Include(c => c.CustomerAssignedToUser)
-            .Where(c => c.CustomerNextMeetingDate != null && !c.IsDeleted)
+            .Where(c => c.CustomerNextMeetingDate != null && c.IsActive && !c.IsDeleted)
             .ToListAsync();
     }
 
@@ -102,13 +102,13 @@ public class CustomerRepository : ICustomerRepository
         return await _context.Customers
             .Include(c => c.Branch)
             .Include(c => c.CustomerAssignedToUser)
-            .FirstOrDefaultAsync(c => c.CustomerContact == phone && c.IsActive == true && c.IsDeleted == false);
+            .FirstOrDefaultAsync(c => c.CustomerContact == phone && c.IsActive && c.IsDeleted);
     }
 
     public async Task<List<CustomerCountByUserDto>> GetCountGroupedByCreatedByAsync(int branchId)
     {
         return await _context.Customers
-            .Where(c => c.BranchId == branchId && c.UserId != null && c.IsActive == true && c.IsDeleted == false)
+            .Where(c => c.BranchId == branchId && c.UserId != null && c.IsActive && c.IsDeleted)
             .GroupBy(c => new { c.UserId, c.User.FullName })
             .Select(g => new CustomerCountByUserDto
             {
@@ -122,7 +122,7 @@ public class CustomerRepository : ICustomerRepository
     public async Task<List<CustomerCountByUserDto>> GetCountGroupedByAssignedToAsync(int branchId)
     {
         return await _context.Customers
-            .Where(c => c.BranchId == branchId && c.CustomerAssignedTo != null && c.IsActive == true && c.IsDeleted == false)
+            .Where(c => c.BranchId == branchId && c.CustomerAssignedTo != null && c.IsActive && c.IsDeleted)
             .GroupBy(c => new { c.CustomerAssignedTo, c.CustomerAssignedToUser.FullName })
             .Select(g => new CustomerCountByUserDto
             {

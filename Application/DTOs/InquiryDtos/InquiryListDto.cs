@@ -40,6 +40,9 @@ public class InquiryListDto
     // Workscope Details
     public List<InquiryWorkscopeDisplayDto> WorkscopeDetails { get; set; } = new();
     public List<InquiryCommentDto> Comments { get; set; } = new();
+    public List<InquiryFileDisplayDto> Files { get; set; } = new();
+
+
 
 }
 
@@ -65,3 +68,11 @@ public class InquiryWorkscopeDisplayDto
     public bool? IsMeasurementReschedule { get; set; }
     public bool? IsDesignReschedule { get; set; }
 }
+public class InquiryFileDisplayDto
+{
+    public string FileName { get; set; }
+    public string FileUrl { get; set; }
+    public string FileType { get; set; } // optional for future use
+    public string TaskType { get; set; } // Measurement, Design, Quotation
+}
+

@@ -25,7 +25,7 @@ public class RejectMeasurementAssignmentCommandHandler
     }
     public async Task<bool> Handle(RejectMeasurementAssignmentCommand command, Guid userId)
     {
-        var inquiry = await _inquiryRepo.GetByIdWithWorkscopesAsync(command.InquiryId);
+        var inquiry = await _inquiryRepo.GetByIdWithWorkscopesAndTasksAsync(command.InquiryId);
         if (inquiry == null || !inquiry.InquiryWorkscopes.Any())
             return false;
 
