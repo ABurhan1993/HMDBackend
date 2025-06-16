@@ -102,7 +102,7 @@ public class CustomerRepository : ICustomerRepository
         return await _context.Customers
             .Include(c => c.Branch)
             .Include(c => c.CustomerAssignedToUser)
-            .FirstOrDefaultAsync(c => c.CustomerContact == phone && c.IsActive && c.IsDeleted);
+            .FirstOrDefaultAsync(c => c.CustomerContact == phone && c.IsActive && !c.IsDeleted);
     }
 
     public async Task<List<CustomerCountByUserDto>> GetCountGroupedByCreatedByAsync(int branchId)
